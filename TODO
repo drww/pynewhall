@@ -1,0 +1,5 @@
+- Build CLI interface for: single-run, batching based on input directory
+- Reporting: textual, graphic output
+- Output: single, directory-per-batch output
+- Import: old csv format, xml format, add json format?
+- Batch output: run statistics (models per second), run time
