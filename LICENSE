@@ -1,4 +1,5 @@
-Copyright (c) 2015, Drew
+pynewhall
+Copyright (c) 2015, Drew Waltman (drww@github)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,3 +27,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+Credits
+
+This application uses Open Source components. You can find the source code of
+their open source projects along with license information below.
+
+Project: Newhall (jNSM) https://github.com/drww/newhall
+License: https://github.com/drww/newhall/blob/master/LICENSE.TXT
+Copyright: 2010-2015 Natural Resources Conservation Service 
+(United States Department of Agriculture) and the
+Center for Environmental Informatics (Penn State University)
