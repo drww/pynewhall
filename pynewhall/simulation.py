@@ -95,10 +95,10 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             temperature[i] = 5.0/9.0 * (temperature[i] - 32)
             precip[i] = precip[i] * 25.4
 
-    # Initialize aggregator calendars.
-    upe = [None]
-    mpe = [None]
-    mwi = [None]
+    # Initialize aggregator calendars and var.
+    upe = [None] + [0.0] * 12
+    mpe = [None] + [0.0] * 12
+    mwi = [None] + [0.0] * 12
     swi = 0.0
 
     # Original Source Line: 405
@@ -136,6 +136,55 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         upe.append(ZPE[kk - 1])
                         break
 
+    # Original Source Line: 495
+    nrow = 0
+    if dataset.get("ns_hemisphere").upper() == "N":
+        for i in range(1, 32):
+            if dataset.get("latitude") < RN[i - 1]:
+                break
+            else:
+                nrow += 1
+
+        for i in range(1, 13):
+            if upe[i] <= 0:
+                continue
+            else:
+                mpe[i] = upe[i] * INZ[i - 1][nrow - 1]
+
+    else:
+        for i in range(1, 14):
+            if dataset.get("latitude") < RS[i - 1]:
+                break
+            else:
+                nrow += 1
+
+        if nrow > 0:
+            for i in range(1, 13):
+                if upe[i] <= 0:
+                    continue
+                elif nrow >= 13 or FS[i - 1][nrow - 1] == FS[i - 1][nrow]:
+                    mpe[i] = upe[i] * FS[i - 1][nrow - 1]
+                else:
+                    cf = ((FS[i - 1][nrow] - FS[i - 1][nrow - 1]) * (((dataset.get("latitude_deg") - \
+                        RS[nrow - 1]) * 60) + dataset.get("latitude_min"))) / \
+                        ((RS[nrow] - RS[nrow - 1]) * 60)
+                    cf += FS[i - 1][nrow - 1]
+                    mpe[i] = upe[i] * cf
+        else:
+            nrow = 1
+            for i in range(1, 13):
+                if upe[i] <= 0:
+                    continue
+                else:
+                    cf = (FS[i - 1][0] - INZ[i - 1][0]) * (dataset.get("latitude_deg") * 60 + \
+                        dataset.get("latitude_min")) / 300
+                    cf += INZ[i - 1][0]
+                    mpe[i] = upe[i] * cf
+
+    # Original Source Line: 140     
+    print upe
+    print mpe
+    print nrow
 
 
 

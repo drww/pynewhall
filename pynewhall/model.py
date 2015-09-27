@@ -71,6 +71,11 @@ class Dataset:
             # First for the basics.
             for key in self.ds_dict:
                 self.ds_dict[key] = input_dict[key]
+            # Expand lat/lon from decimal degrees into degrees and minutes.
+            # During export only decimal degrees are saved.
+            self.ds_dict["latitude_deg"] = int(self.ds_dict["latitude"])
+            self.ds_dict["latitude_min"] = \
+                (self.ds_dict["latitude"] - self.ds_dict["latitude_deg"]) * 60
             # Also for optional metadata dictionary.
             if input_metadata_dict:
                 # Non-critical metadata, treat the missing as empty strings.
