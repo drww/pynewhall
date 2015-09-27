@@ -72,3 +72,74 @@ DR = [1., 1., 1., 1., 1.02, 1.03, 1.05, 1.07, 1.09, 1.11, 1.13, 1.15, 1.17, 1.19
 # up, and 10 days for when the soil is cooling off.
 lagPhaseSummer = 21;
 lagPhaseWinter = 10;
+
+# Simulation body follows.
+
+# Run the Newhall simulation model given argument dataset, 
+# waterholding capacity, fc (optional), and fcd (optional).
+def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
+    # Begin setting up the base values for the model.
+    elevation = dataset.get("elevation")
+
+    # The model does a lot of index-1 addressing of these lists.  
+    # To compensate, fill the 0th item with a null.
+    temperature = [None] + dataset.get("temperature")
+    precip = [None] + dataset.get("precipitation")
+
+    # Model operates in metric, convert units if needed.
+    if not dataset.get("is_metric"):
+        # Convert to meters using original model factor, 1ft = 0.3048m.
+        elevation *= 0.305
+        for i in range(1, 13):
+            # Convert F to C, inches to millimeters.
+            temperature[i] = 5.0/9.0 * (temperature[i] - 32)
+            precip[i] = precip[i] * 25.4
+
+    # Initialize aggregator calendars.
+    upe = [None]
+    mpe = [None]
+    mwi = [None]
+    swi = 0.0
+
+    # Original Source Line: 405
+
+    # Check temps for months over 0 degrees C.  If so, store MWI value.
+    # mwi = (temp/5)**1.514  If not, store zero.
+    for i in range(1, 13):
+        if temperature[i] > 0:
+            mwi_val = (temperature[i] / 5) ** 1.514
+            mwi.append(mwi_val)
+            swi += mwi_val
+        else:
+            mwi.append(0)
+
+    # Original Source Line: 425
+
+    a = (0.000000675 * swi * swi * swi) - \
+        (0.0000771 * swi * swi) + (0.01792 * swi) + 0.49239
+
+    # Original Source Line: 430
+
+    # Build upe list.
+    for i in range(1, 13):
+        if temperature[i] > 0:
+            if temperature[i] < 26.5:
+                a_base = 10 * (temperature[i] / swi)
+                upe.append(16 * (a_base ** a))
+            elif temperature[i] >= 38:
+                upe.append(185.0)
+            else:
+                for i in range(1, 13):
+                    kl = ki + 1
+                    kk = ki
+                    if temperature[i] > ZT[ki - 1] and temperature[i] < ZT[kl - 1]:
+                        upe.append(ZPE[kk - 1])
+                        break
+
+
+
+
+
+
+
+
