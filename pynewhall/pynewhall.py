@@ -16,7 +16,7 @@ def run_model(file_or_directory):
         # Parse into dataset.
         dataset = parse(input_file)
         print dataset.to_json()
-        print dataset.to_dict()
+
         # Store report from model invocation on dataset.
         # Check output selections.
         # Write output file, close.
