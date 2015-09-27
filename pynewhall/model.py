@@ -2,22 +2,22 @@ import json
 
 class Dataset:
 
-    def get_properties():
+    def get_properties(self):
         return self.properties
 
-    def get(key):
+    def get(self, key):
         return self.ds_dict[key]
 
-    def set(key, value):
+    def set(self, key, value):
         if key in self.properties:
             self.ds_dict[key] = value
         else:
             raise Exception("Argument key is not a valid dataset property.")
 
-    def to_dict():
+    def to_dict(self):
         return self.ds_dict
 
-    def to_json():
+    def to_json(self):
         # Return dataset as JSON string.
         return json.dumps(self.ds_dict, sort_keys=True)
 
@@ -27,7 +27,7 @@ class Dataset:
 
         self.properties = ["name", "country", "latitude", "longitude", "ns_hemisphere",
                 "ew_hemisphere", "elevation", "precipitation", "temperature", "start_year",
-                "end_year", "is_metric", "water_holding_capacity"]
+                "end_year", "is_metric"]
         self.extended_properties = ["station_name", "station_id", "station_elevation", 
             "station_state_providence", "station_country", "mlra_name", "mlra_id", 
             "contrib_first_name", "contrib_last_name", "contrib_title", "contrib_org",

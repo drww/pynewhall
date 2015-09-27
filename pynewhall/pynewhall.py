@@ -1,6 +1,7 @@
 import argparse, os
 
 from model import Dataset
+from parsers import parse
 
 VERSION = 0.1
 
@@ -13,7 +14,9 @@ def run_model(file_or_directory):
         # Single run mode, open file and run.
         input_file = open(file_or_directory, "r")
         # Parse into dataset.
-        dataset = Dataset({})
+        dataset = parse(input_file)
+        print dataset.to_json()
+        print dataset.to_dict()
         # Store report from model invocation on dataset.
         # Check output selections.
         # Write output file, close.
