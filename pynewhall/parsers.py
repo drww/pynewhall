@@ -1,3 +1,4 @@
+import json
 from model import Dataset
 
 CSV_FIELD_NAMES = ["name", "country", "latitude_degrees", "latitude_minutes", "ns_hemisphere",
@@ -52,6 +53,11 @@ def csv_parse(contents):
     # Construct and return Dataset object without metadata.
     return Dataset(ds_dict)
 
+def json_parse(contents):
+    # Parse JSON, which is super-easy since it maps directly.
+    input_dict = json.loads(contents)
+    return Dataset(input_dict)
+
 def parse(file):
     # Take input file, apply correct parser, return Dataset.
     contents = file.read()
@@ -66,8 +72,7 @@ def parse(file):
         pass
     elif first_bytes[0] == "{":
         # Use JSON parser.
-        print "IMPLEMENT JSON"
-        pass
+        return json_parse(contents)
     else:
         # Use CSV parser.
         return csv_parse(contents)
