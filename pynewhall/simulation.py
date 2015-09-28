@@ -182,12 +182,86 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     mpe[i] = upe[i] * cf
 
     # Original Source Line: 140     
-    print upe
-    print mpe
-    print nrow
+    
+    arf = 0
+    aev = 0
+    for i in range(1, 13):
+        arf += precip[i]
+        aev += mpe[i]
 
+    # GOSUB 660
 
+    sumt = 0
+    for i in range(1, 13):
+        sumt += temperature[i]
 
+    tma = sumt / 12 + fc
+    at1 = (temperature[6] + temperature[7] + temperature[8]) / 3 + fc
+    at2 = (temperature[1] + temperature[2] + temperature[12]) / 3 + fc
+
+    st = 0
+    wt = 0
+    if dataset.get("ns_hemisphere").upper() == "N":
+      st = at1
+      wt = at2
+    else:
+      st = at2
+      wt = at1
+
+    dif = abs(at1 - at2)
+    cs = dif * (1 - fcd) / 2
+
+    # Original Source Line: 680
+
+    # TEMPERATURE REGIME DETERMINATION
+
+    # The cr[] dictionary holds the criteria used to determine temperature regimes.
+    # The reg[] dictionary holds the flags for each regime.  The last-most
+    # flag that registers true identifies the temperature regime.
+
+    cr = {                                  # Criteria for regime determination:
+        1: tma < 0,                         # Mean annual air temp (MAAT) < 0C.
+        2: 0 <= tma and tma < 8,            # 0C <= MAAT <= 8C.
+        3: (st - cs) < 15,                  # Summer temp ave minus (summer/winter difference * (1 - SOIL_AIR_REL) * 0.5) < 15C.
+        7: (dif * fcd) > 5,                 # Summer/winter difference * SOIL_AIR_REL > 5.  Change to 6?
+        8: (tma >= 8) and (tma < 15),        # 8C <= MAAT < 15C.
+        9: (tma >= 15) and (tma < 22),       # 15C <= MAAT < 22C.
+        10: tma >= 22,                      # 22C <= MAAT.
+        11: tma < 8                         # MAAT < 8C.
+    }
+
+    reg = {                                 # Temperature regime type:
+        1: cr[1],                           # Pergelic
+        2: cr[2] and cr[3],                 # Cryic
+        3: cr[11] and not cr[3] and cr[7],  # Frigid
+        4: cr[8] and cr[7],                 # Mesic
+        5: cr[9] and cr[7],                 # Thermic
+        6: cr[10] and cr[7],                # Hyperthermic
+        7: cr[11] and not cr[7] and \
+            not cr[3],                      # Isofrigid
+        8: cr[8] and not cr[7],             # Isomesic
+        9: cr[9] and not cr[7],             # Isothermic
+        10: cr[10] and not cr[7]            # Isohyperthermic
+    }
+
+    st -= cs
+    wt += cs
+    dif = st - wt
+
+    # Original Source Line: 145
+
+    trr = ""
+    for i in range(1, 11):
+        if reg[i]:
+            trr = TEMP_REGIMES[i - 1]
+    
+    print trr
+    
+    
+    
+    
+    
+    
 
 
 
