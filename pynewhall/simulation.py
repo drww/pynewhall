@@ -250,18 +250,207 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
     # Original Source Line: 145
 
+    # Set temperature regime.
     trr = ""
     for i in range(1, 11):
         if reg[i]:
             trr = TEMP_REGIMES[i - 1]
     
-    print trr
-    
-    
-    
-    
-    
-    
+    # Original Source Line: 50 ("STORVAR5")
+
+    whc = water_holding_capacity
+    fsl = whc / 64
+    sl = [0.0] * 65
+
+    k = 1
+    swst = 0
+    swfi = 0
+
+    ntwi = [0.0] * 4
+    ntsu = [0.0] * 4
+    nsd = [0.0] * 4
+    nzd = [0.0] * 4
+    nd = [0.0] * 4
+    cc = [False] * 4
+
+    cd = [0.0] * 6
+
+    # Original Source Line: 300
+
+    msw = -1
+    sib = 0
+    sir = 0.0
+    x = 0
+    swm = False
+    max = 0
+    icon = 0
+    lt5c = 0
+    lt8c = 0
+    ie = 0
+    ib = 1
+    prmo = 0
+    nccd = 0
+    nccm = 0
+    id8c = 0
+    id5c = 0
+    swt = 0
+    tc = 0
+    np = 0
+    np8 = 0
+    ncsm = 0
+    ncwm = 0
+    ncsp = 0
+    ncwp = 0
+
+    # Original Source Line: 360
+
+    nbd = [0.0] * 7
+    ned = [0.0] * 7
+    nbd8 = [0.0] * 7
+    ned8 = [0.0] * 7
+
+    iday = [0] * 361
+
+    swp = -1
+    gogr = 0
+
+    no_mpe_greater_than_precip = True
+    for i in range(1, 13):
+        if mpe[i] > precip[i]:
+            no_mpe_greater_than_precip = False
+            break
+    if no_mpe_greater_than_precip:
+        cd[5] = -1
+        swt = -1
+
+    for i in range(1, 11):
+        for im in range(1, 13):
+            zsw = 0
+            lp = precip[im] / 2
+            npe = (lp - mpe[im]) / 2
+            if npe <= 0:
+                npe = 0 - npe
+            else:
+                zsw = -1
+
+            for i3 in range(1, 65):
+                if zsw == 0:
+                    nr = DP[i3 - 1]
+                    if sl[nr] <= 0:
+                        continue
+                    else:
+                        rpe = sl[nr] * DR[i3 - 1]
+                        if npe <= rpe:
+                            sl[nr] = sl[nr] - (npe / DR[i3 - 1])
+                            npe = 0
+                            break;
+                        else:
+                            sl[nr] = 0
+                            npe = npe - rpe
+                            continue
+                else:
+                    if sl[i3] >= fsl:
+                        continue
+                    else:
+                        esl = fsl - sl[i3]
+                        if esl >= npe:
+                            sl[i3] += npe
+                            break
+                        else:
+                            sl[i3] = fsl
+                            npe -= esl
+                            continue
+
+            hp = precip[im] / 2
+            for i3 in range(1, 65):
+                if sl[i3] >= fsl:
+                    continue
+                else:
+                    esl = fsl - sl[i3]
+                    if esl >= hp:
+                        sl[i3] += hp
+                        break
+                    else:
+                        sl[i3] = fsl
+                        hp -= esl
+                        continue
+
+            # Original Source Line: 2750
+
+            zsw = 0
+            lp = precip[im] / 2
+            npe = (lp - mpe[im]) / 2
+            if npe <= 0:
+                npe = 0 - npe
+            else:
+                zsw = -1
+
+            # Original Source Line: 2770
+
+            for i3 in range (1, 65):
+                if zsw == 0:
+                    nr = DP[i3 - 1]
+                    if sl[nr] <= 0:
+                        continue
+                    else:
+                        rpe = sl[nr] * DR[i3 - 1]
+                        if npe <= rpe:
+                            sl[nr] -= npe / DR[i3 - 1]
+                            npe = 0
+                            break
+                        else:
+                            sl[nr] = 0
+                            npe -= rpe
+                            continue
+                else:
+                    if sl[i3] >= fsl:
+                        continue
+                    else:
+                        esl = fsl - sl[i3]
+                        if esl >= npe:
+                            sl[i3] = fsl
+                            npe = npe - esl
+                            continue
+
+            # Continue for next value in im.
+            continue
+
+        # Original Source Line: 510
+
+        tmoi = 0
+        for it in range(1, 65):
+            tmoi += sl[it]
+
+        if abs(tmoi - prmo) < (prmo / 100):
+            break
+        else:
+            prmo = tmoi
+            continue
+
+    # Original Source Line: 550
+
+    gogr = -1
+
+    for i in range(1, 4):
+        cc[i] = False
+
+    # Build pc and cc boolean arrays.
+    pc = [False] * 7
+    pc[1] = sl[9] <= 0
+    pc[2] = sl[17] <= 0
+    pc[3] = sl[25] <= 0
+
+    cc[1] = pc[1] and pc[2] and pc[3]
+    cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+
+    pc[4] = sl[9] > 0
+    pc[5] = sl[17] > 0
+    pc[6] = sl[25] > 0
+
+    cc[3] = pc[4] and pc[5] and pc[6]
+
+    print pc
+    print cc
 
 
 
