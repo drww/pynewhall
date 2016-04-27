@@ -1,10 +1,14 @@
-import argparse, os
+import argparse, os, logging
 
 from model import Dataset
 from parsers import parse
 from simulation import run_simulation
 
 VERSION = 0.1
+
+# TODO: User-specified logging level.
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 def print_version():
     print "PyNewhall {}".format(VERSION)
@@ -13,26 +17,23 @@ def run_model(file_or_directory):
     # Determine if input is single or multi run.
     if os.path.isfile(file_or_directory):
         # Single run mode, open file and run.
-        print "IMPORTING FILE"
+        logger.debug("Importing file: {}".format(file_or_directory))
         input_file = open(file_or_directory, "r")
-        print input_file
 
         # Parse into dataset.
         dataset = parse(input_file)
-        print "BUILT DATASET"
-        print dataset.to_json()
+        logger.debug("Built dataset: {}".format(dataset.get("name")))
 
         # Run the model and catch the results.
-        print "RUNNING SIMULATION"
         results = run_simulation(dataset)
+        logger.debug("Simulation run complete, results: {}".format(results))
 
         # Store report from model invocation on dataset.
         # Check output selections.
         # Write output file, close.
-        print "DONE"
         exit(-1)
     elif os.path.isdir(file_or_directory):
-        print "IMPLEMENT ME"
+        logger.debug("WRITE ME!")
         exit(-1)
     else:
         # Not a file or directory, exit.

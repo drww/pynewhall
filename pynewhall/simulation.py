@@ -1,4 +1,7 @@
+import logging
 from model import Dataset, RunResult
+
+logger = logging.getLogger(__name__)
 
 # Simulation constants follow.
 
@@ -78,6 +81,7 @@ lagPhaseWinter = 10;
 # Run the Newhall simulation model given argument dataset, 
 # waterholding capacity, fc (optional), and fcd (optional).
 def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
+    logger.debug("Running simulation: {}".format(dataset.get("name")))
     # Begin setting up the base values for the model.
     elevation = dataset.get("elevation")
 
@@ -224,8 +228,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         2: 0 <= tma and tma < 8,            # 0C <= MAAT <= 8C.
         3: (st - cs) < 15,                  # Summer temp ave minus (summer/winter difference * (1 - SOIL_AIR_REL) * 0.5) < 15C.
         7: (dif * fcd) > 5,                 # Summer/winter difference * SOIL_AIR_REL > 5.  Change to 6?
-        8: (tma >= 8) and (tma < 15),        # 8C <= MAAT < 15C.
-        9: (tma >= 15) and (tma < 22),       # 15C <= MAAT < 22C.
+        8: (tma >= 8) and (tma < 15),       # 8C <= MAAT < 15C.
+        9: (tma >= 15) and (tma < 22),      # 15C <= MAAT < 22C.
         10: tma >= 22,                      # 22C <= MAAT.
         11: tma < 8                         # MAAT < 8C.
     }
@@ -454,4 +458,5 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
 
 
-
+    logger.debug("Returning results after model run.")
+    return False
