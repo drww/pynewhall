@@ -454,6 +454,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             break
 
     # Original Source Line: 570 leading into GOSUB 1630
+    # Run month loop.
 
     for im in range(1, 13):
         dmc = [0] * 4
@@ -544,57 +545,114 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                                 # Original Source Line: 1990
 
+                                mm = i / 30
+                                if i % 30 == 0:
+                                    mm -= 1
 
+                                if ii == -1:
+                                    ii = 29
 
+                                if mm < 0:
+                                    mm = 0
 
-        #         int kk = k;
-        #         k = pmc;
-        #         if (kk == pmc) {
-        #           // 1910
-        #           continue;
-        #         }
+                            ib = ie + 1
+                            nd[k] += igmc
+                            pmc = kk
+                            k = kk
+                            continue
 
-        #         if (npe <= 0) {
-        #           // 1920
-        #           break;
-        #         }
+                # Original Source Line: 1680
 
-        #         // 1790
+                else:
+                    if npe <= 0:
+                        break
+                    else:
+                        if sl[i3] >= fsl:
+                            continue
+                        else:
+                            esl = fsl - sl[i3]
+                            if esl >= npe:
+                                sl[i3] += npe
+                                npe = 0
+                            else:
+                                sl[i3] = fsl
+                                npe -= esl
 
-        #         double rpe = cnpe - npe;
-        #         dmc[k] = (int) ((15 * rpe) / cnpe) - dpmc;
-        #         igmc = dmc[k];
-        #         dpmc = dmc[k] + dpmc;
-        #         dmc[k] = 0;
+                            cc = [False] * 4
+                            pc = [False] * 7
 
-        #         // 1820 - GOSUB 1960
+                            pc[1] = sl[9] <= 0
+                            pc[2] = sl[17] <= 0
+                            pc[3] = sl[25] <= 0
+                            cc[1] = pc[1] and pc[2] and pc[3]
+                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+                            pc[4] = sl[9] > 0
+                            pc[5] = sl[17] > 0
+                            pc[6] = sl[25] > 0
+                            cc[3] = pc[4] and pc[5] and pc[6]
 
-        #         int ii = 0;
-        #         int mm = 0;
-        #         ie += igmc;
-        #         for (int i = ib; i <= ie; i++) {
-        #           iday[i] = k;
-        #           // Screen rendering.
-        #           if (i > 30) {
-        #             ii = (i % 30) - 1;
-        #           } else {
-        #             ii = i;
-        #           }
-        #           // 1990
-        #           mm = i / 30;
-        #           if (i % 30 == 0) {
-        #             mm = mm - 1;
-        #           }
+                            for i in range(1, 4):
+                                if cc[i]:
+                                    k = i
+                                    break
 
-        #           if (ii == -1) {
-        #             ii = 29;
-        #           }
+                            kk = k
+                            k = pmc
+                            if kk == pmc:
+                                continue
 
-        #           if (mm < 0) {
-        #             mm = 0;
-        #           }
-        #           // More screen rendering with
-        #           // a GOSUB 4460 call.
+                            if npe <= 0:
+                                break
+
+                            rpe -= cnpe
+                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            igmc = dmc[k]
+                            dpmc += dmc[k]
+                            dmc[k] = 0
+
+                            # Original Source Line: 1820
+
+                            ii = 0
+                            mm = 0
+                            ie += igmc
+
+                            for i in range(ib, ie + 1):
+                                iday[i] = k
+                                if i > 30:
+                                    ii = (i % 30) - 1
+                                else:
+                                    ii = ib
+                                mm = i / 30
+                                if i % 30 == 0:
+                                    mm -= 1
+                                if ii == -1:
+                                    ii = 29
+                                if mm < 0:
+                                    mm = 0
+
+                            ib = ie + 1
+                            nd[k] += igmc
+                            pmc = kk
+                            k = kk
+                            continue
+
+        # Original Source Line: 1920
+        # End of month loop.
+
+        dmc[k] = 15 - dpmc
+        igmc = dmc[k]
+        dmc[k] = 0
+
+        
+
+      # // 1920
+
+      # dmc[k] = 15 - dpmc;
+      # igmc = dmc[k];
+      # dmc[k] = 0;
+
+      # // GOSUB 1960
+
 
 
 
