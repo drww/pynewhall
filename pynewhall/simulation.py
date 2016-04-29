@@ -643,18 +643,304 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         igmc = dmc[k]
         dmc[k] = 0
 
-        
+        ii = 0
+        mm = 0
+        ie += igmc
 
-      # // 1920
+        for i in range(ib, ie + 1):
+            iday[i] = k
+            if i > 30:
+                ii = (i % 30) - 1
+            else:
+                ii = i
+            # TODO: Remove 1990 dupes.
+            mm = i / 30
+            if i % 30 == 0:
+                mm -= 1
+            if ii == -1:
+                ii = 29
+            if mm < 0:
+                mm = 0
 
-      # dmc[k] = 15 - dpmc;
-      # igmc = dmc[k];
-      # dmc[k] = 0;
+        ib = ie + 1
+        nd[k] += igmc
 
-      # // GOSUB 1960
+        hp = precip[im] / 2
+        for i3 in range(1, 65):
+            if sl[i3] >= fsl:
+                continue
+            else:
+                esl = fsl - sl[i3]
+                if esl >= hp:
+                    sl[i3] += hp
+                    break
+                else:
+                    sl[i3] = fsl
+                    hp -= esl
+                    continue
+
+        # Original Source Line: 1630 - "Second Half"
+
+        cc = [False] * 4
+        pc = [False] * 7
+
+        # TODO: Remove GOSUB 2880 duplications.
+
+        pc[1] = sl[9] <= 0
+        pc[2] = sl[17] <= 0
+        pc[3] = sl[25] <= 0
+        cc[1] = pc[1] and pc[2] and pc[3]
+        cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+        pc[4] = sl[9] > 0
+        pc[5] = sl[17] > 0
+        pc[6] = sl[25] > 0
+        cc[3] = pc[4] and pc[5] and pc[6]
+
+        for i in range(1, 4):
+            if cc[i]:
+                k = i
+                break
+
+        for i in range(i, 4):
+            dmc[i] = 0
+            cc[i] = False
+
+        # TODO: Another repeat w/ i3 loop.
+
+        zsw = 0
+        dpmc = 0
+        pmc = k
+
+        lp = precip[im] / 2
+        npe = (lp - mpe[im]) / 2
+        cnpe = 0
+        skipi3Loop = False
+
+        if npe < 0:
+            npe *= -1
+            cnpe = npe
+        elif npe == 0:
+            skipi3Loop = True
+        else:
+            zsw = -1
+            cnpe = npe
+
+        if not skipi3Loop:
+            for i3 in range(1, 65):
+                if zsw == 0:
+                    if npe <= 0:
+                        break
+                    else:
+                        nr = DP[i3 - 1]
+                        if sl[nr] <= 0:
+                            continue
+                        else:
+                            rpd = sl[nr] * DR[i3 - 1]
+                            if npe <= rpd:
+                                sl[nr] -= npe / DR[i3 -1]
+                                npe = 0
+                            else:
+                                sl[nr] = 0
+                                npe -= rpd
+
+                            cc = [False] * 4
+                            pc = [False] * 7
+
+                            pc[1] = sl[9] <= 0
+                            pc[2] = sl[17] <= 0
+                            pc[3] = sl[25] <= 0
+                            cc[1] = pc[1] and pc[2] and pc[3]
+                            cc[2] = not cc[1] and(pc[1] or pc[2] or pc[3])
+                            pc[4] = sl[9] > 0
+                            pc[5] = sl[17] > 0
+                            pc[6] = sl[25] > 0
+                            cc[3] = pc[4] and pc[5] and pc[6]
+
+                            for i in range(1, 4):
+                                if cc[i]:
+                                    k = i
+                                    break
+
+                            kk = k
+                            k = pmc
+                            if kk == pmc:
+                                continue
+                            if npe <= 0:
+                                break
+
+                            rpe = cnpe - npe
+                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            igmc = dmc[k]
+                            dpmc += dmc[k]
+                            dmc[k] = 0
+
+                            ii = 0
+                            mm = 0
+                            ie =+ igmc
+                            for i in range(ib, ie + 1):
+                                iday[i] = k
+                                if i > 30:
+                                    ii = (i % 30) - 1
+                                else:
+                                    ii = i
+                                mm = i / 30
+                                if i % 30 == 0:
+                                    mm -= 1
+                                if ii == -1:
+                                    ii = 29
+                                if mm < 0:
+                                    mm = 0
+                            ib = ie + 1
+                            nd[k] += igmc
+
+                            # Original Source Line: 1820 - GOSUB 1960
+                            # Java Waypoint: 1115 in SimulationModel
+                            # TODO: Many repeated regions, condense.
+
+                            ii = 0
+                            mm = 0
+                            ie += igmc
+                            for i in range(ib, ie + 1):
+                                iday[i] = k
+                                if i > 30:
+                                    ii = (i % 30) - 1
+                                else:
+                                    ii = i
+                                mm = i / 30
+                                if i % 30 == 0:
+                                    mm -= 1
+                                if ii == -1:
+                                    ii = 29
+                                if mm < 0:
+                                    mm = 0
+                            ib = ie + 1
+                            nd[k] =+ igmc
+                            pmc = kk
+                            k = kk
+                            continue
+                else:
+                    if npe <= 0:
+                        break
+                    else:
+                        if sl[i3] >= fsl:
+                            continue
+                        else:
+                            esl = fsl - sl[i3]
+                            if esl >= npe:
+                                sl[i3] += npe
+                                npe = 0
+                            else:
+                                sl[i3] = fsl
+                                npe -= esl
+
+                            cc = [False] * 4
+                            pc = [False] * 7
+
+                            pc[1] = sl[9] <= 0
+                            pc[2] = sl[17] <= 0
+                            pc[3] = sl[25] <= 0
+                            cc[1] = pc[1] and pc[2] and pc[3]
+                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3]);
+                            pc[4] = sl[9] > 0
+                            pc[5] = sl[17] > 0
+                            pc[6] = sl[25] > 0
+                            cc[3] = pc[4] and pc[5] and pc[6]
+
+                            for i in range(1, 4):
+                                if cc[i]:
+                                    k = i
+                                    break
+
+                            kk = k
+                            k = pmc
+                            if kk == pmc:
+                                continue
+                            if npe <= 0:
+                                break
+
+                            rpe = cnpe - npe
+                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            igmc = dmc[k]
+                            dpmc =+ dmc[k]
+                            dmc[k] = 0
+
+                            # Java Source: 1241
+
+                            ii = 0
+                            mm = 0
+                            ie += igmc
+                            for i in range(ib, ie + 1):
+                                iday[i] = k
+                                if i > 30:
+                                    ii = (i % 30) - 1
+                                else:
+                                    ii = i
+                                mm = i / 30
+                                if (i % 30) == 0:
+                                    mm -= 1
+                                if ii == -1:
+                                    ii = 29
+                                if mm < 0:
+                                    mm = 0
+                            ib = ie + 1
+                            nd[k] =+ igmc
+                            pmc = kk
+                            k = kk
+                            continue
+
+            # Java Source: 1280, end of i3 loop.
+
+            dmc[k] = 15 - dpmc
+            igmc = dmc[k]
+            dmc[k] = 0
+
+            ii = 0
+            mm = 0
+            ie += igmc
+            for i in range(ib, ie + 1):
+                iday[i] = k
+                if i > 30:
+                    ii = (i % 30) - 1
+                else:
+                    ii = i
+                mm = i / 30
+                if (i % 30) == 0:
+                    mm -= 1
+                if ii == -1:
+                    ii = 29
+                if mm < 0:
+                    mm = 0
+            ib = ie + 1
+            nd[k] =+ igmc
+            continue
+
+        # Java Source: 1327
+
+        sn = 0
+        kj = 0
+        ia = 0
+        iz = 0
+        nj = [0] * 14
+        crr = 0.0
+        c = [False] * 15
+        tempUnderFive = False
+        zwt = False
+
+        for i in range(1, 13):
+            if temperature[i] < 5:
+                tempUnderFive = True
+                break
+
+        skipTo890 = False
+        t13 = 0.0
+
+        if tempUnderFive:
+            t13 = temperature[1]
+            for it in range(1, 12):
+                pass
 
 
 
-
+    ####
     logger.debug("Returning results after model run.")
     return False
