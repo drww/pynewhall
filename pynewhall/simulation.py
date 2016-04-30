@@ -71,8 +71,8 @@ DR = [1., 1., 1., 1., 1.02, 1.03, 1.05, 1.07, 1.09, 1.11, 1.13, 1.15, 1.17, 1.19
 
 # Lag phases.  21 days is used for when the soil is warming
 # up, and 10 days for when the soil is cooling off.
-lagPhaseSummer = 21;
-lagPhaseWinter = 10;
+lagPhaseSummer = 21
+lagPhaseWinter = 10
 
 # Simulation body follows.
 
@@ -87,6 +87,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     # To compensate, fill the 0th item with a null.
     temperature = [None] + dataset.get("temperature")
     precip = [None] + dataset.get("precipitation")
+
+    # Hack to keep a problematic region of code from running
+    # twice for some datasets.  Hack forces the original model
+    # behavior, quirks and all.
+    hasRunAlready = False
 
     # Model operates in metric, convert units if needed.
     if not dataset.get("is_metric"):
@@ -345,7 +350,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         if npe <= rpe:
                             sl[nr] = sl[nr] - (npe / DR[i3 - 1])
                             npe = 0
-                            break;
+                            break
                         else:
                             sl[nr] = 0
                             npe = npe - rpe
@@ -508,7 +513,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             pc[2] = sl[17] <= 0
                             pc[3] = sl[25] <= 0
                             cc[1] = pc[1] and pc[2] and pc[3]
-                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3]);
+                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
                             pc[4] = sl[9] > 0
                             pc[5] = sl[17] > 0
                             pc[6] = sl[25] > 0
@@ -840,7 +845,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             pc[2] = sl[17] <= 0
                             pc[3] = sl[25] <= 0
                             cc[1] = pc[1] and pc[2] and pc[3]
-                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3]);
+                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
                             pc[4] = sl[9] > 0
                             pc[5] = sl[17] > 0
                             pc[6] = sl[25] > 0
@@ -937,7 +942,214 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         if tempUnderFive:
             t13 = temperature[1]
             for it in range(1, 12):
-                pass
+                if temperature[it] == 5 and temperature[it + 1] == 5:
+                    temperature[it] = 5.01
+            if temperature[12] == 5 and t13 == 5:
+                temperature[12] = 5.01
+            
+            crr = 5
+            nj = [0] * 13
+            zwt = False
+            kj = 1
+            ia = 30
+            iz = 30
+
+            # TODO: Determine why this exists.
+            if crr != 8:
+                ia = 36
+                iz = 25
+
+            for i in range (1, 13):
+                c = [False] * 15
+
+                m0 = i - 1
+                m1 = i
+                m2 = i + 1
+                if m2 > 12:
+                    m2 -= 12
+                if m0 < 1:
+                    m0 += 12
+
+                c[1] = temperature[m1] < crr
+                c[2] = temperature[m2] > crr
+                c[3] = temperature[m0] < crr
+                c[4] = temperature[m1] == crr
+                c[5] = temperature[m2] > crr
+                c[6] = temperature[m2] < crr
+                c[7] = temperature[m1] > crr
+                c[8] = temperature[m0] > crr
+                c[9] = c[1] and c[2]
+                c[10] = c[3] and c[4] and c[5]
+                c[11] = c[9] or c[10]
+                c[12] = c[6] and c[7]
+                c[13] = c[8] and c[6] and c[4]
+                c[14] = c[12] or c[13]
+
+                if c[11]:
+                    nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
+                        temperature[m1]) / (temperature[m2] - temperature[m1])))
+                    if nj[kj] > 360:
+                        nj[kj] -= 360
+                    kj += 1
+                    zwt = True
+                    continue
+                elif c[14]:
+                    nj[kj] = (m0 * 30) + iz + int((30 * (temperature[m1] - 
+                        crr)) / (temperature[m1] - temperature[m2]))
+                    if nj[kj] > 360:
+                        nj[kj] -= 360
+                        kj += 1
+                        zwt = False
+                    continue
+                else:
+                    continue
+
+            if zwt:
+                le = int(kj - 2)
+                npro = int(nj[1])
+                for i in range(1, le + 1):
+                    nj[i] = nj[i + 1]
+                nj[le + 1] = npro
+
+            # Original Source Line: 2700
+            # Java Source Line: 1450
+
+            npj = (kj - 1) / 2
+            nbj = [0] * 7
+            nej = [0] * 7
+            for i in range(1, npj + 1):
+                ib = 2 * i - 1
+                ie = 2 * ib
+                nbj[i] = nj[ib]
+                nej[i] = nj[ie]
+
+            for i in range(1, 7):
+                nbd[i] = nbj[i]
+                ned[i] = nej[i]
+
+            np = npj
+            tc = -1
+            jb = 0
+            ir = 0.0
+            jr = 0.0
+            je = 0.0
+
+            if np == 0:
+                if wt <= 5:
+                    lt5c = 0
+                    nbd[1] = -1
+                    id5c = 0
+                    for ik in range(1, 4):
+                        nsd[ik] = 0
+                    tc = 0
+                    skipTo890 = True
+            else:
+                for i in range(1, np + 1):
+                    ib = int(nbd[i])
+                    if nbd[i] < ned[i]:
+                        ir = ned[i] - nbd[i] + 1
+                        jb = ib
+                        jr = ir
+                    else:
+                        ir = 361 - nbd[i] + ned[i]
+                        jb = ib
+                        jr = ir
+
+                    for ij in range(1, 4):
+                        nzd[ij] = 0
+
+                    je = jb + jr - 1
+
+                    for l in range(jb, je + 1):
+                        j = l
+                        if j > 360:
+                            j -= 360
+                        ik = iday[j]
+                        nzd[ik] += 1
+
+                    if not hasRunAlready:
+                        for ic in range(1, 4):
+                            nsd[ic] += nzd[ic]
+                            hasRunAlready = True
+
+                    lt5c += ir
+
+                id5c = nbd[1]
+                skipTo890 = True
+
+        if not skipTo890:
+            tc = 0
+            for ic in range(1, 4):
+                nsd[ic] = nd[ic]
+            lt5c = 360
+            id5c = 0
+
+        ncpm = [0] * 4
+        tempUnder8C = False
+        for ic in range(1, 13):
+            if temperature[ic] < 8:
+                tempUnder8C = True
+                break
+
+        if tempUnder8C:
+            t13 = temperature[1]
+            for it in range(1, 12):
+                if temperature[it] == 8 and temperature[it + 1] == 8:
+                    temperature[it] = 8.01
+            crr = 8
+            if temperature[12] == 8 and t13 == 8:
+                temperature[12] = 8.01
+
+            nj = [0] * 13
+            zwt = False
+            kj = 1
+            ia = 30
+            iz = 30
+            # TODO: Bridge this region with other crr-using region.
+            if crr != 8:
+                ia = 36
+                iz = 25
+
+            for i in range(1, 13):
+                c = [False] * 15
+
+                m0 = i - 1
+                m1 = i
+                m2 = i + 1
+                if m2 > 12:
+                    m2 -= 12
+                if m0 < 1:
+                    m0 += 12
+
+                c[1] = temperature[m1] < crr
+                c[2] = temperature[m2] > crr
+                c[3] = temperature[m0] < crr
+                c[4] = temperature[m1] == crr
+                c[5] = temperature[m2] > crr
+                c[6] = temperature[m2] < crr
+                c[7] = temperature[m1] > crr
+                c[8] = temperature[m0] > crr
+                c[9] = c[1] and c[2]
+                c[10] = c[3] and c[4] and c[5]
+                c[11] = c[9] or c[10]
+                c[12] = c[6] and c[7]
+                c[13] = c[8] and c[6] and c[4]
+                c[14] = c[12] or c[13]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
