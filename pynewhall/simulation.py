@@ -1426,8 +1426,213 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             n1 = n + 1
             if n1 > 360:
                 n1 -= 360
-        
+            if n > 360:
+                si = n - 360
+            else:
+                si = n
 
+            if swm:
+                if iday[si] == x:
+                    if iday[xi] != iday[n1]:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
+            else:
+                if iday[si] != x:
+                    if iday[n1] == x:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
+
+            if sw != 0:
+                ifin = ns[x]
+            if ifin > max:
+                max = ifin
+
+            # Original Source Line: GOSUB 2160 returns to 1290
+
+            nccm = max
+            tu = 0
+            skipTo1420 = False
+
+            if nd[3] == 360:
+                ncsm = 180
+                ncwm = 180
+                ncsp = 180
+                ncwp = 180
+                ntsu[3] = 180
+                ntwi[3] = 180
+                skipTo1420 = True
+            elif nd[1] == 360:
+                skipTo1420 = True
+            elif nd[1] == 0:
+                tu = -1
+                sib = ib
+                x = 3
+                swm = True  # swm = tu != 0
+
+                ns = [0] * 5
+                ns[x] = 0
+                ifin = 0
+                sw = 0
+                si = 0
+                max = 0
+                siz = sib + sir - 1
+
+                for n in range(sib, siz + 1):
+                    n1 = n + 1
+                    if n1 > 360:
+                        n1 -= 360
+                    if n > 360:
+                        si = n - 360
+                    else:
+                        si = n
+
+                    if swm:
+                        if iday[si] == x:
+                            if iday[si] != iday[n1]:
+                                if sw != 0:
+                                    ns[x] += 1
+                                    if ns[x] > max:
+                                        max = ns[x]
+                                    ns[x] = 0
+                                    sw = 0
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                ns[x] += 1
+                                sw = -1
+                                continue
+                        else:
+                            continue
+                    else:
+                        if iday[si] != x:
+                            if iday[n1] == x:
+                                if sw != 0:
+                                    ns[x] += 1
+                                    if ns[x] > max:
+                                        max = ns[x]
+                                    ns[x] = 0
+                                    sw = 0
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                ns[x] += 1
+                                sw = -1
+                                continue
+                        else:
+                            continue
+
+                if sw != 0:
+                    ifin = ns[x]
+                if ifin > max:
+                    max = ifin
+
+                # Original Source Line: Return from GOSUB 2160
+
+                ncsp = max
+                sib = ic
+                sir = 180
+                swm = (tu != 0)
+
+                ns = [0] * 5
+                ns[x] = 0
+                ifin = 0
+                sw = 0
+                si = 0
+                max = 0
+                siz = sib + sir - 1
+
+                # Another n loop.
+
+                for n in range(sib, siz + 1):
+                    n1 = n + 1
+                    if n1 > 360:
+                        n1 -= 360
+                    if n > 360:
+                        si = n - 360
+                    else:
+                        si = n
+
+                    if swm:
+                        if iday[si] == x:
+                            if iday[si] != iday[n1]:
+                                if sw != 0:
+                                    ns[x] += 1
+                                    if ns[x] > max:
+                                        max = ns[x]
+                                    ns[x] = 0
+                                    sw = 0
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                ns[x] += 1
+                                sw = -1
+                                continue
+                        else:
+                            continue
+                    else:
+                        if iday[si] != x:
+                            if iday[n1] == x:
+                                if sw != 0:
+                                    ns[x] += 1
+                                    if ns[x] > max:
+                                        max = ns[x]
+                                    ns[x] = 0
+                                    sw = 0
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                ns[x] += 1
+                                sw = -1
+                                continue
+                        else:
+                            continue
+
+                if sw != 0:
+                    ifin = ns[x]
+                if ifin > max:
+                    max = ifin
+
+                ncwp = max
+
+            else:
+                # Original Source Line: 1330
+                tu = 0
+                sib = ib
+                sir = 180
+                x = 1
+                swm = False
+
+                
 
     ####
     logger.debug("Returning results after model run.")
