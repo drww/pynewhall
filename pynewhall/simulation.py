@@ -1136,21 +1136,297 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 c[13] = c[8] and c[6] and c[4]
                 c[14] = c[12] or c[13]
 
+                if c[11]:
+                    nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
+                        temperature[m1]) / (temperature[m2] - temperature[m1])))
+                    if nj[kj] > 360:
+                        nj[kj] -= 360
+                    kj += 1
+                    zwt = True
+                    continue
+                elif c[14]:
+                    nj[kj] = (m0 * 30) + iz + int(((30 * (temperature[m1] - 
+                        crr)) / (temperature[m1] - temperature[m2])))
+                    if nj[kj] > 360:
+                        nj[kj] -= 360
+                    kj += 1
+                    zwt = False
+                    continue
+                else:
+                    continue
 
+            # Original Source Line: 2660
 
+            if zwt:
+                le = kj - 2
+                npro = nj[1]
+                for i in range(1, le + 1):
+                    nj[i] = nj[i + 1]
+                nj[le + 1] = npro
 
+            npj = int((kj - 1) / 2)
+            nbj = [0] * 7
+            nej = [0] * 7
+            for i in range(i, npj + 1):
+                ib = 2 * i - 1
+                ie = 2 * i
+                nbj[i] = nj[ib]
+                nej[i] = nj[ie]
 
+            for i in range(1, 7):
+                nbd8[i] = nbj[i]
+                ned8[i] = nej[i]
 
+            np8 = npj
+            tc = -1
+            if np8 != 0:
+                for i in range(1, np8 + 1):
+                    ib = int(nbd8[i])
+                    ir = 0.0
+                    if nbd8[i] < ned8[i]:
+                        ir = ned8[i] - nbd8[i] + 1
+                    else:
+                        ir = 361 - nbd8[i] + ned8[i]
 
+                    msw = 0
+                    sib = ib
+                    sir = ir
+                    x = 1
+                    swm = (msw != 0)
 
+                    ns = [0] * 5
+                    ns[x] = 0
+                    ifin = 0
+                    sw = 0
+                    si = 0
+                    max = 0
+                    siz = sib + sir - 1
 
+                    # Java Source Line: 1745
 
+                    for n in range(sib, siz + 1):
+                        n1 = n + 1
+                        if n1 > 360:
+                            n1 -= 360
+                        if n > 360:
+                            si = n - 360
+                        else:
+                            si = n
 
+                        if swm:
+                            if iday[si] == x:
+                                if iday[si] != iday[n1]:
+                                    if sw != 0:
+                                        ns[x] += 1
+                                        if ns[x] > max:
+                                            max = ns[x]
+                                        ns[x] = 0
+                                        sw = 0
+                                        continue
+                                    else:
+                                        continue
+                                else:
+                                    ns[x] += 1
+                                    sw = -1
+                                    continue
+                            continue
+                        else:
+                            if iday[si] != x:
+                                if iday[n1] == x:
+                                    if sw != 0:
+                                        ns[x] += 1
+                                        if ns[x] > max:
+                                            max = ns[x]
+                                        ns[x] = 0
+                                        sw = 0
+                                        continue
+                                    else:
+                                        continue
+                                else:
+                                    ns[x] += 1
+                                    sw = -1
+                                    continue
+                            else:
+                                continue
 
+                if sw != 0:
+                    ifin = ns[x]
 
+                if ifin > max:
+                    max = ifin
 
+                icon = max
+                if ncpm[2] > icon:
+                    continue
+                else:
+                    ncpm[2] = icon
+                    lt8c = int(ir)
+                    id8c = int(nbd8[i])
+                    continue
 
+            # Major "i" loop complete, BASIC source line 1140.
+            sn = -1
+    else:
+        # BASIC Source Line: 920 -> GOTO 1170
+        msw = 0
+        tc = -1
+        lt8c = 360
+        id8c = 0
 
+    sib = 1
+    sir = 720
+    x = 1
+    swm = (msw != 0)
+
+    ns = [0] * 5
+    ns[x] = 0
+    ifin = 0
+    sw = 0
+    si = 0
+    max = 0
+    siz = sib + sir - 1
+
+    for n in range(sib, siz + 1):
+        n1 = n + 1
+        while n1 > 360:
+            n1 -= 360
+        if n > 360:
+            si = n - 360
+        else:
+            si = n
+
+        if swm:
+            if iday[si] == x:
+                if iday[si] != iday[n1]:
+                    if sw != 0:
+                        ns[x] += 1
+                        if ns[x] > max:
+                            max = ns[x]
+                        ns[x] = 0
+                        sw = 0
+                        continue
+                    else:
+                        continue
+                else:
+                    ns[x] += 1
+                    sw = -1
+                    continue
+            else:
+                continue
+        else:
+            if iday[si] != x:
+                if iday[n1] == x:
+                    if sw != 0:
+                        ns[x] += 1
+                        if ns[x] > max:
+                            max = ns[x]
+                        ns[x] = 0
+                        sw = 0
+                        continue
+                    else:
+                        continue
+                else:
+                    ns[x] += 1
+                    sw = -1
+                    continue
+            else:
+                continue
+
+        if sw != 0:
+            ifin = ns[x]
+
+        if ifin > max:
+            max = ifin
+
+        # BASIC Source Line: GOSUB 2160 returns to 1190
+
+        icon = max
+        if icon > 360:
+            icon = 360
+        ncpm[1] = icon
+        if sn == 0:
+            ncpm[2] = ncpm[1]
+
+        # Testing for Xeric moisture regime criteria.
+
+        sn = 0
+        msw = -1
+        ic = 0
+
+        if dataset.get("ns_hemisphere").upper() == "N":
+            ib = 181
+            ic = 1
+        else:
+            ib = 1
+            ic = 181
+
+        sib = ib
+        sir = 120
+        x = 1
+        swm = (msw != 0)
+        ns = [0] * 5
+        ns[x] = 0
+        ifin = 0
+        sw = 0
+        si = 0
+        max = 0
+        siz = sib + sir - 1
+
+        if swm:
+            if iday[si] == x:
+                if iday[si] != iday[n1]:
+                    if sw != 0:
+                        ns[x] += 1
+                        if ns[x] > max:
+                            max = ns[x]
+                        ns[x] = 0
+                        sw = 0
+                        continue
+                    else:
+                        continue
+                else:
+                    ns[x] += 1
+                    sw = -1
+                    continue
+            else:
+                continue
+        else:
+            if iday[si] != x:
+                if iday[n1] == x:
+                    if sw != 0:
+                        ns[x] += 1
+                        if ns[x] > max:
+                            max = ns[x]
+                        ns[x] = 0
+                        sw = 0
+                        continue
+                    else:
+                        continue
+                else:
+                    ns[x] += 1
+                    sw = -1
+                    continue
+            else:
+                continue
+
+        if sw != 0:
+            ifin = ns[x]
+        if ifin > max:
+            max = ifin
+
+        nccd = max
+        sib = ic
+        sir = 120
+        x = 3
+        swm = (msw != 0)
+
+        # Java source: 2150
+
+        for n in range(sib, siz + 1):
+            n1 = n + 1
+            if n1 > 360:
+                n1 -= 360
+        
 
 
     ####
