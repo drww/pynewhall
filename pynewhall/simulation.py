@@ -1,5 +1,5 @@
 import logging
-from model import Dataset, RunResult
+from dataset import Dataset, RunResult
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,27 @@ DR = [1., 1., 1., 1., 1.02, 1.03, 1.05, 1.07, 1.09, 1.11, 1.13, 1.15, 1.17, 1.19
 lagPhaseSummer = 21
 lagPhaseWinter = 10
 
-# Simulation body follows.
+# Given float lists precip and evap, and bools only_summer and
+# is_n_hemisphere.  Computes running balance, adding each month's
+# precip and removing evapotranspiration.  If only_summer, only use
+# the summer months for the given hemisphere.
+def compute_water_balance(precip, evap, only_summer, is_n_hemisphere):
+    running_balance = 0.0
+    if only_summer:
+        if is_n_hemisphere:
+            # Check only months 6, 7, and 8.
+            for i in range(6, 9):
+                running_balance += precip[i]
+                running_balance -= evap[i]
+        else:
+            for i in [12, 1, 2]:
+                running_balance += precip[i]
+                running_balance -= evap[i]
+    else:
+        for i in range(1, 13):
+            running_balance += precip[i]
+            running_balance -= evap[i]
+    return running_balance
 
 # Run the Newhall simulation model given argument dataset, 
 # waterholding capacity, fc (optional), and fcd (optional).
@@ -1843,10 +1863,152 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         stt = 0
 
                         for j in range(1, nt + 1):
-                            pass
+                            if not (kr[j] <= kr[j + 1]):
+                                itemp = kr[j]
+                                itm = m[j]
+                                kr[j] = kr[j + 1]
+                                m[j] = m[j + 1]
+                                kr[j + 1] = itemp
+                                m[j + 1] = itm
+                                stt = -1
 
+                        if stt == 0:
+                            break
+                        else:
+                            nt -= 1
 
+                    ima = m[24]
+                    nul = 0
 
+                    for i in range(1, 25):
+                        if kr[i] == 0:
+                            nul += 1
+
+                    kk = 0
+                    for i in range(1, 25):
+                        kk = i
+                        ipl = i + nul
+                        if ipl > 24:
+                            break
+                        else:
+                            kr[i] = kr[ipl]
+                            m[i] = m[ipl]
+
+                    for i in range(kk, 25):
+                        kr[i] = 0
+
+                    if kr[1] != 1:
+                        ie = int(kr[1] - 1)
+                        for i in range(1, ie + 1):
+                            ntd[i] = kl[ima]
+
+                    ns2 = 0
+                    nn = 24 - nul
+                    for i in range(1, nn + 1):
+                        ns2 = m[i]
+                        ib = int(kr[i])
+                        ie = int(kr[i + 1] - 1)
+                        if kr[i + 1] == 0:
+                            ie = 360
+
+                        for j in range(ib, ie + 1):
+                            ntd[j] = kl[ns2]
+
+            # Regime determination time!
+            # Original source line: 1430 -> GOSUB 3390
+
+            ans = " "
+            div = " "
+            q = " "
+            if swt != 0:
+                ans = "Perudic"
+                ncsm = 180
+                ncwm = 180
+                ncsp = 180
+                ntsu[3] = 180
+                ntwi[3] = 180
+            elif nsd[1] > (lt5c / 2) and ncpm[2] < 90:
+                ans = "Aridic"
+                if nd[1] == 360:
+                    q = "Extreme"
+                elif ncpm[2] <= 45:
+                    q = "Typic"
+                else:
+                    q = "Weak"
+                    div = ans
+            elif tma < 22 and dif >= 5 and nccd >= 45 and nccm >= 45:
+                ans = "Xeric"
+                if nccd > 90:
+                    q = "Dry"
+                else:
+                    q = "Typic"
+                div = ans
+            elif nd[1] + nd[2] < 90:
+                ans = "Udic"
+                if nd[1] + nd[2] < 30:
+                    q = "Typic"
+                    div = ans
+                else:
+                    q = "Dry"
+                    if div < 5:
+                        div = "Tropudic"
+                    else:
+                        div = "Tempudic"
+            elif trr != "Pergelic" and trr != "Cryic":
+                ans = "Ustic"
+                if div >= 5:
+                    div = "Tempustic"
+                    if nccm <= 45:
+                        q = "Typic"
+                    elif nccd > 45:
+                        q = "Xeric"
+                    else:
+                        q = "Wet"
+                else:
+                    div = "Tropustic"
+                    if ncpm[2] < 180:
+                        q = "Aridic"
+                    elif ncpm[2] < 270:
+                        q = "Typic"
+                    else:
+                        q = "Udic"
+            else:
+                ans = "Undefined"
+                div = ans
+
+            # Original source line: Return from GOSUB 3390
+
+            # Calculate water balances for year/summer.
+            awb = compute_water_balance(precip, mpe, False, 
+                dataset.get("ns_hemisphere") == "N")
+            swb = compute_water_balance(precip, mpe, True, 
+                dataset.get("ns_hemisphere") == "N")
+
+            rr_dict = {
+                "annual_rainfall": "",
+                "water_holding_capacity": "",
+                "annual_water_balance": "",
+                "summer_water_balance": "",
+                "mean_potential_evapotranspiration": "",
+                "days_dry_after_summer_solstice": "",
+                "moist_days_after_winter_solstice": "",
+                "num_cumulative_days_dry": "",
+                "num_cumulative_days_moist_dry": "",
+                "num_cumulative_days_moist": "",
+                "num_cumulative_days_dry_over_5c": "",
+                "num_cumulative_days_moist_dry_over_5c": "",
+                "num_cumulative_days_moist_over_5c": "",
+                "num_consecutive_days_moist_someplaces": "",
+                "num_consecutive_days_moist_over_8c_someplaces": "",
+                "temperature_calendar": "",
+                "moisture_calendar": "",
+                "nsd": "",
+                "ncpm": "",
+                "temperature_regime": "",
+                "moisture_regime:": "",
+                "regime_subdivision_1": "",
+                "regime_subdivision_2": ""
+            }
     ####
     logger.debug("Returning results after model run.")
     return False

@@ -112,7 +112,7 @@ class RunResult:
 
     def __init__(self, data_set, result_map):
         # Store original dataset, merge in result_map.
-        self.dataset = dataset
+        self.dataset = data_set
         self.rr_dict = {
             "annual_rainfall": "",
             "water_holding_capacity": "",
@@ -136,8 +136,7 @@ class RunResult:
             "temperature_regime": "",
             "moisture_regime:": "",
             "regime_subdivision_1": "",
-            "regime_subdivision_2": "",
-            "flx_file_string": ""
+            "regime_subdivision_2": ""
         }
 
         try:
