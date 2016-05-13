@@ -629,13 +629,13 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             if npe <= 0:
                                 break
 
-                            rpe -= cnpe
+                            rpe = cnpe - npe
                             dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
                             igmc = dmc[k]
                             dpmc += dmc[k]
                             dmc[k] = 0
 
-                            # Original Source Line: 1820
+                            # Original Source Line: 1820 -> GOSUB 1960
 
                             ii = 0
                             mm = 0
@@ -939,335 +939,337 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             nd[k] =+ igmc
             continue
 
-        # Java Source: 1327
+    # TODO, indent fucked
 
-        sn = 0
-        kj = 0
-        ia = 0
-        iz = 0
-        nj = [0] * 14
-        crr = 0.0
-        c = [False] * 15
-        tempUnderFive = False
+    # Java Source: 1327
+
+    sn = 0
+    kj = 0
+    ia = 0
+    iz = 0
+    nj = [0] * 14
+    crr = 0.0
+    c = [False] * 15
+    tempUnderFive = False
+    zwt = False
+
+    for i in range(1, 13):
+        if temperature[i] < 5:
+            tempUnderFive = True
+            break
+
+    skipTo890 = False
+    t13 = 0.0
+
+    if tempUnderFive:
+        t13 = temperature[1]
+        for it in range(1, 12):
+            if temperature[it] == 5 and temperature[it + 1] == 5:
+                temperature[it] = 5.01
+        if temperature[12] == 5 and t13 == 5:
+            temperature[12] = 5.01
+        
+        crr = 5
+        nj = [0] * 13
         zwt = False
+        kj = 1
+        ia = 30
+        iz = 30
 
-        for i in range(1, 13):
-            if temperature[i] < 5:
-                tempUnderFive = True
-                break
+        # TODO: Determine why this exists.
+        if crr != 8:
+            ia = 36
+            iz = 25
 
-        skipTo890 = False
-        t13 = 0.0
+        for i in range (1, 13):
+            c = [False] * 15
 
-        if tempUnderFive:
-            t13 = temperature[1]
-            for it in range(1, 12):
-                if temperature[it] == 5 and temperature[it + 1] == 5:
-                    temperature[it] = 5.01
-            if temperature[12] == 5 and t13 == 5:
-                temperature[12] = 5.01
-            
-            crr = 5
-            nj = [0] * 13
-            zwt = False
-            kj = 1
-            ia = 30
-            iz = 30
+            m0 = i - 1
+            m1 = i
+            m2 = i + 1
+            if m2 > 12:
+                m2 -= 12
+            if m0 < 1:
+                m0 += 12
 
-            # TODO: Determine why this exists.
-            if crr != 8:
-                ia = 36
-                iz = 25
+            c[1] = temperature[m1] < crr
+            c[2] = temperature[m2] > crr
+            c[3] = temperature[m0] < crr
+            c[4] = temperature[m1] == crr
+            c[5] = temperature[m2] > crr
+            c[6] = temperature[m2] < crr
+            c[7] = temperature[m1] > crr
+            c[8] = temperature[m0] > crr
+            c[9] = c[1] and c[2]
+            c[10] = c[3] and c[4] and c[5]
+            c[11] = c[9] or c[10]
+            c[12] = c[6] and c[7]
+            c[13] = c[8] and c[6] and c[4]
+            c[14] = c[12] or c[13]
 
-            for i in range (1, 13):
-                c = [False] * 15
-
-                m0 = i - 1
-                m1 = i
-                m2 = i + 1
-                if m2 > 12:
-                    m2 -= 12
-                if m0 < 1:
-                    m0 += 12
-
-                c[1] = temperature[m1] < crr
-                c[2] = temperature[m2] > crr
-                c[3] = temperature[m0] < crr
-                c[4] = temperature[m1] == crr
-                c[5] = temperature[m2] > crr
-                c[6] = temperature[m2] < crr
-                c[7] = temperature[m1] > crr
-                c[8] = temperature[m0] > crr
-                c[9] = c[1] and c[2]
-                c[10] = c[3] and c[4] and c[5]
-                c[11] = c[9] or c[10]
-                c[12] = c[6] and c[7]
-                c[13] = c[8] and c[6] and c[4]
-                c[14] = c[12] or c[13]
-
-                if c[11]:
-                    nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
-                        temperature[m1]) / (temperature[m2] - temperature[m1])))
-                    if nj[kj] > 360:
-                        nj[kj] -= 360
-                    kj += 1
-                    zwt = True
-                    continue
-                elif c[14]:
-                    nj[kj] = (m0 * 30) + iz + int((30 * (temperature[m1] - 
-                        crr)) / (temperature[m1] - temperature[m2]))
-                    if nj[kj] > 360:
-                        nj[kj] -= 360
-                        kj += 1
-                        zwt = False
-                    continue
-                else:
-                    continue
-
-            if zwt:
-                le = int(kj - 2)
-                npro = int(nj[1])
-                for i in range(1, le + 1):
-                    nj[i] = nj[i + 1]
-                nj[le + 1] = npro
-
-            # Original Source Line: 2700
-            # Java Source Line: 1450
-
-            npj = (kj - 1) / 2
-            nbj = [0] * 7
-            nej = [0] * 7
-            for i in range(1, npj + 1):
-                ib = 2 * i - 1
-                ie = 2 * ib
-                nbj[i] = nj[ib]
-                nej[i] = nj[ie]
-
-            for i in range(1, 7):
-                nbd[i] = nbj[i]
-                ned[i] = nej[i]
-
-            np = npj
-            tc = -1
-            jb = 0
-            ir = 0.0
-            jr = 0.0
-            je = 0.0
-
-            if np == 0:
-                if wt <= 5:
-                    lt5c = 0
-                    nbd[1] = -1
-                    id5c = 0
-                    for ik in range(1, 4):
-                        nsd[ik] = 0
-                    tc = 0
-                    skipTo890 = True
-            else:
-                for i in range(1, np + 1):
-                    ib = int(nbd[i])
-                    if nbd[i] < ned[i]:
-                        ir = ned[i] - nbd[i] + 1
-                        jb = ib
-                        jr = ir
-                    else:
-                        ir = 361 - nbd[i] + ned[i]
-                        jb = ib
-                        jr = ir
-
-                    for ij in range(1, 4):
-                        nzd[ij] = 0
-
-                    je = jb + jr - 1
-
-                    for l in range(jb, je + 1):
-                        j = l
-                        if j > 360:
-                            j -= 360
-                        ik = iday[j]
-                        nzd[ik] += 1
-
-                    if not hasRunAlready:
-                        for ic in range(1, 4):
-                            nsd[ic] += nzd[ic]
-                            hasRunAlready = True
-
-                    lt5c += ir
-
-                id5c = nbd[1]
-                skipTo890 = True
-
-        if not skipTo890:
-            tc = 0
-            for ic in range(1, 4):
-                nsd[ic] = nd[ic]
-            lt5c = 360
-            id5c = 0
-
-        ncpm = [0] * 4
-        tempUnder8C = False
-        for ic in range(1, 13):
-            if temperature[ic] < 8:
-                tempUnder8C = True
-                break
-
-        if tempUnder8C:
-            t13 = temperature[1]
-            for it in range(1, 12):
-                if temperature[it] == 8 and temperature[it + 1] == 8:
-                    temperature[it] = 8.01
-            crr = 8
-            if temperature[12] == 8 and t13 == 8:
-                temperature[12] = 8.01
-
-            nj = [0] * 13
-            zwt = False
-            kj = 1
-            ia = 30
-            iz = 30
-            # TODO: Bridge this region with other crr-using region.
-            if crr != 8:
-                ia = 36
-                iz = 25
-
-            for i in range(1, 13):
-                c = [False] * 15
-
-                m0 = i - 1
-                m1 = i
-                m2 = i + 1
-                if m2 > 12:
-                    m2 -= 12
-                if m0 < 1:
-                    m0 += 12
-
-                c[1] = temperature[m1] < crr
-                c[2] = temperature[m2] > crr
-                c[3] = temperature[m0] < crr
-                c[4] = temperature[m1] == crr
-                c[5] = temperature[m2] > crr
-                c[6] = temperature[m2] < crr
-                c[7] = temperature[m1] > crr
-                c[8] = temperature[m0] > crr
-                c[9] = c[1] and c[2]
-                c[10] = c[3] and c[4] and c[5]
-                c[11] = c[9] or c[10]
-                c[12] = c[6] and c[7]
-                c[13] = c[8] and c[6] and c[4]
-                c[14] = c[12] or c[13]
-
-                if c[11]:
-                    nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
-                        temperature[m1]) / (temperature[m2] - temperature[m1])))
-                    if nj[kj] > 360:
-                        nj[kj] -= 360
-                    kj += 1
-                    zwt = True
-                    continue
-                elif c[14]:
-                    nj[kj] = (m0 * 30) + iz + int(((30 * (temperature[m1] - 
-                        crr)) / (temperature[m1] - temperature[m2])))
-                    if nj[kj] > 360:
-                        nj[kj] -= 360
+            if c[11]:
+                nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
+                    temperature[m1]) / (temperature[m2] - temperature[m1])))
+                if nj[kj] > 360:
+                    nj[kj] -= 360
+                kj += 1
+                zwt = True
+                continue
+            elif c[14]:
+                nj[kj] = (m0 * 30) + iz + int((30 * (temperature[m1] - 
+                    crr)) / (temperature[m1] - temperature[m2]))
+                if nj[kj] > 360:
+                    nj[kj] -= 360
                     kj += 1
                     zwt = False
-                    continue
+                continue
+            else:
+                continue
+
+        if zwt:
+            le = int(kj - 2)
+            npro = int(nj[1])
+            for i in range(1, le + 1):
+                nj[i] = nj[i + 1]
+            nj[le + 1] = npro
+
+        # Original Source Line: 2700
+        # Java Source Line: 1450
+
+        npj = (kj - 1) / 2
+        nbj = [0] * 7
+        nej = [0] * 7
+        for i in range(1, npj + 1):
+            ib = 2 * i - 1
+            ie = 2 * ib
+            nbj[i] = nj[ib]
+            nej[i] = nj[ie]
+
+        for i in range(1, 7):
+            nbd[i] = nbj[i]
+            ned[i] = nej[i]
+
+        np = npj
+        tc = -1
+        jb = 0
+        ir = 0.0
+        jr = 0.0
+        je = 0.0
+
+        if np == 0:
+            if wt <= 5:
+                lt5c = 0
+                nbd[1] = -1
+                id5c = 0
+                for ik in range(1, 4):
+                    nsd[ik] = 0
+                tc = 0
+                skipTo890 = True
+        else:
+            for i in range(1, np + 1):
+                ib = int(nbd[i])
+                if nbd[i] < ned[i]:
+                    ir = ned[i] - nbd[i] + 1
+                    jb = ib
+                    jr = ir
                 else:
-                    continue
+                    ir = 361 - nbd[i] + ned[i]
+                    jb = ib
+                    jr = ir
 
-            # Original Source Line: 2660
+                for ij in range(1, 4):
+                    nzd[ij] = 0
 
-            if zwt:
-                le = kj - 2
-                npro = nj[1]
-                for i in range(1, le + 1):
-                    nj[i] = nj[i + 1]
-                nj[le + 1] = npro
+                je = jb + jr - 1
 
-            npj = int((kj - 1) / 2)
-            nbj = [0] * 7
-            nej = [0] * 7
-            for i in range(i, npj + 1):
-                ib = 2 * i - 1
-                ie = 2 * i
-                nbj[i] = nj[ib]
-                nej[i] = nj[ie]
+                for l in range(jb, je + 1):
+                    j = l
+                    if j > 360:
+                        j -= 360
+                    ik = iday[j]
+                    nzd[ik] += 1
 
-            for i in range(1, 7):
-                nbd8[i] = nbj[i]
-                ned8[i] = nej[i]
+                if not hasRunAlready:
+                    for ic in range(1, 4):
+                        nsd[ic] += nzd[ic]
+                        hasRunAlready = True
 
-            np8 = npj
-            tc = -1
-            if np8 != 0:
-                for i in range(1, np8 + 1):
-                    ib = int(nbd8[i])
-                    ir = 0.0
-                    if nbd8[i] < ned8[i]:
-                        ir = ned8[i] - nbd8[i] + 1
+                lt5c += ir
+
+            id5c = nbd[1]
+            skipTo890 = True
+
+    if not skipTo890:
+        tc = 0
+        for ic in range(1, 4):
+            nsd[ic] = nd[ic]
+        lt5c = 360
+        id5c = 0
+
+    ncpm = [0] * 4
+    tempUnder8C = False
+    for ic in range(1, 13):
+        if temperature[ic] < 8:
+            tempUnder8C = True
+            break
+
+    if tempUnder8C:
+        t13 = temperature[1]
+        for it in range(1, 12):
+            if temperature[it] == 8 and temperature[it + 1] == 8:
+                temperature[it] = 8.01
+        crr = 8
+        if temperature[12] == 8 and t13 == 8:
+            temperature[12] = 8.01
+
+        nj = [0] * 13
+        zwt = False
+        kj = 1
+        ia = 30
+        iz = 30
+        # TODO: Bridge this region with other crr-using region.
+        if crr != 8:
+            ia = 36
+            iz = 25
+
+        for i in range(1, 13):
+            c = [False] * 15
+
+            m0 = i - 1
+            m1 = i
+            m2 = i + 1
+            if m2 > 12:
+                m2 -= 12
+            if m0 < 1:
+                m0 += 12
+
+            c[1] = temperature[m1] < crr
+            c[2] = temperature[m2] > crr
+            c[3] = temperature[m0] < crr
+            c[4] = temperature[m1] == crr
+            c[5] = temperature[m2] > crr
+            c[6] = temperature[m2] < crr
+            c[7] = temperature[m1] > crr
+            c[8] = temperature[m0] > crr
+            c[9] = c[1] and c[2]
+            c[10] = c[3] and c[4] and c[5]
+            c[11] = c[9] or c[10]
+            c[12] = c[6] and c[7]
+            c[13] = c[8] and c[6] and c[4]
+            c[14] = c[12] or c[13]
+
+            if c[11]:
+                nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
+                    temperature[m1]) / (temperature[m2] - temperature[m1])))
+                if nj[kj] > 360:
+                    nj[kj] -= 360
+                kj += 1
+                zwt = True
+                continue
+            elif c[14]:
+                nj[kj] = (m0 * 30) + iz + int(((30 * (temperature[m1] - 
+                    crr)) / (temperature[m1] - temperature[m2])))
+                if nj[kj] > 360:
+                    nj[kj] -= 360
+                kj += 1
+                zwt = False
+                continue
+            else:
+                continue
+
+        # Original Source Line: 2660
+
+        if zwt:
+            le = kj - 2
+            npro = nj[1]
+            for i in range(1, le + 1):
+                nj[i] = nj[i + 1]
+            nj[le + 1] = npro
+
+        npj = int((kj - 1) / 2)
+        nbj = [0] * 7
+        nej = [0] * 7
+        for i in range(i, npj + 1):
+            ib = 2 * i - 1
+            ie = 2 * i
+            nbj[i] = nj[ib]
+            nej[i] = nj[ie]
+
+        for i in range(1, 7):
+            nbd8[i] = nbj[i]
+            ned8[i] = nej[i]
+
+        np8 = npj
+        tc = -1
+        if np8 != 0:
+            for i in range(1, np8 + 1):
+                ib = int(nbd8[i])
+                ir = 0.0
+                if nbd8[i] < ned8[i]:
+                    ir = ned8[i] - nbd8[i] + 1
+                else:
+                    ir = 361 - nbd8[i] + ned8[i]
+
+                msw = 0
+                sib = ib
+                sir = ir
+                x = 1
+                swm = (msw != 0)
+
+                ns = [0] * 5
+                ns[x] = 0
+                ifin = 0
+                sw = 0
+                si = 0
+                max = 0
+                siz = sib + sir - 1
+
+                # Java Source Line: 1745
+
+                for n in range(sib, siz + 1):
+                    n1 = n + 1
+                    if n1 > 360:
+                        n1 -= 360
+                    if n > 360:
+                        si = n - 360
                     else:
-                        ir = 361 - nbd8[i] + ned8[i]
+                        si = n
 
-                    msw = 0
-                    sib = ib
-                    sir = ir
-                    x = 1
-                    swm = (msw != 0)
-
-                    ns = [0] * 5
-                    ns[x] = 0
-                    ifin = 0
-                    sw = 0
-                    si = 0
-                    max = 0
-                    siz = sib + sir - 1
-
-                    # Java Source Line: 1745
-
-                    for n in range(sib, siz + 1):
-                        n1 = n + 1
-                        if n1 > 360:
-                            n1 -= 360
-                        if n > 360:
-                            si = n - 360
-                        else:
-                            si = n
-
-                        if swm:
-                            if iday[si] == x:
-                                if iday[si] != iday[n1]:
-                                    if sw != 0:
-                                        ns[x] += 1
-                                        if ns[x] > max:
-                                            max = ns[x]
-                                        ns[x] = 0
-                                        sw = 0
-                                        continue
-                                    else:
-                                        continue
-                                else:
+                    if swm:
+                        if iday[si] == x:
+                            if iday[si] != iday[n1]:
+                                if sw != 0:
                                     ns[x] += 1
-                                    sw = -1
+                                    if ns[x] > max:
+                                        max = ns[x]
+                                    ns[x] = 0
+                                    sw = 0
                                     continue
-                            continue
-                        else:
-                            if iday[si] != x:
-                                if iday[n1] == x:
-                                    if sw != 0:
-                                        ns[x] += 1
-                                        if ns[x] > max:
-                                            max = ns[x]
-                                        ns[x] = 0
-                                        sw = 0
-                                        continue
-                                    else:
-                                        continue
                                 else:
-                                    ns[x] += 1
-                                    sw = -1
                                     continue
                             else:
+                                ns[x] += 1
+                                sw = -1
                                 continue
+                        continue
+                    else:
+                        if iday[si] != x:
+                            if iday[n1] == x:
+                                if sw != 0:
+                                    ns[x] += 1
+                                    if ns[x] > max:
+                                        max = ns[x]
+                                    ns[x] = 0
+                                    sw = 0
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                ns[x] += 1
+                                sw = -1
+                                continue
+                        else:
+                            continue
 
                 if sw != 0:
                     ifin = ns[x]
@@ -1295,6 +1297,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
     sib = 1
     sir = 720
+    x = 1
+    swm = (msw != 0)
+
+    sib = ib
+    sir = 120
     x = 1
     swm = (msw != 0)
 
@@ -1352,45 +1359,56 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             else:
                 continue
 
-        if sw != 0:
-            ifin = ns[x]
+    if sw != 0:
+        ifin = ns[x]
 
-        if ifin > max:
-            max = ifin
+    if ifin > max:
+        max = ifin
 
-        # BASIC Source Line: GOSUB 2160 returns to 1190
+    # BASIC Source Line: GOSUB 2160 returns to 1190
 
-        icon = max
-        if icon > 360:
-            icon = 360
-        ncpm[1] = icon
-        if sn == 0:
-            ncpm[2] = ncpm[1]
+    icon = max
+    if icon > 360:
+        icon = 360
+    ncpm[1] = icon
+    if sn == 0:
+        ncpm[2] = ncpm[1]
 
-        # Testing for Xeric moisture regime criteria.
+    # Testing for Xeric moisture regime criteria.
+    # Java source line: 2005
 
-        sn = 0
-        msw = -1
-        ic = 0
+    sn = 0
+    msw = -1
+    ic = 0
 
-        if dataset.get("ns_hemisphere").upper() == "N":
-            ib = 181
-            ic = 1
+    if dataset.get("ns_hemisphere").upper() == "N":
+        ib = 181
+        ic = 1
+    else:
+        ib = 1
+        ic = 181
+
+    sib = ib
+    sir = 120
+    x = 1
+    swm = (msw != 0)
+
+    ns = [0] * 5
+    ns[x] = 0
+    ifin = 0
+    sw = 0
+    si = 0
+    max = 0
+    siz = sib + sir - 1
+
+    for n in range(sib, siz + 1):
+        n1 = n + 1
+        if n1 > 360:
+            n1 -= 360
+        if n > 360:
+            si = n - 360
         else:
-            ib = 1
-            ic = 181
-
-        sib = ib
-        sir = 120
-        x = 1
-        swm = (msw != 0)
-        ns = [0] * 5
-        ns[x] = 0
-        ifin = 0
-        sw = 0
-        si = 0
-        max = 0
-        siz = sib + sir - 1
+            si = n
 
         if swm:
             if iday[si] == x:
@@ -1429,18 +1447,108 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             else:
                 continue
 
-        if sw != 0:
-            ifin = ns[x]
-        if ifin > max:
-            max = ifin
+    # Java source line: 2122
 
-        nccd = max
-        sib = ic
-        sir = 120
+    if sw != 0:
+        ifin = ns[x]
+    if ifin > max:
+        max = ifin
+
+    nccd = max
+    sib = ic
+    sir = 120
+    x = 3
+    swm = (msw != 0)
+
+    ns = [0] * 5
+    ns[x] = 0
+    sw = 0
+    si = 0
+    max = 0
+    siz = sib + sir - 1
+
+    # Java source: 2150
+
+    for n in range(sib, siz + 1):
+        n1 = n + 1
+        if n1 > 360:
+            n1 -= 360
+        if n > 360:
+            si = n - 360
+        else:
+            si = n
+
+        if swm:
+            if iday[si] == x:
+                if iday[si] != iday[n1]:
+                    if sw != 0:
+                        ns[x] += 1
+                        if ns[x] > max:
+                            max = ns[x]
+                        ns[x] = 0
+                        sw = 0
+                        continue
+                    else:
+                        continue
+                else:
+                    ns[x] += 1
+                    sw = -1
+                    continue
+            else:
+                continue
+        else:
+            if iday[si] != x:
+                if iday[n1] == x:
+                    if sw != 0:
+                        ns[x] += 1
+                        if ns[x] > max:
+                            max = ns[x]
+                        ns[x] = 0
+                        sw = 0
+                        continue
+                    else:
+                        continue
+                else:
+                    ns[x] += 1
+                    sw = -1
+                    continue
+            else:
+                continue
+
+    if sw != 0:
+        ifin = ns[x]
+    if ifin > max:
+        max = ifin
+
+    # Original Source Line: GOSUB 2160 returns to 1290
+
+    nccm = max
+    tu = 0
+    skipTo1420 = False
+
+    if nd[3] == 360:
+        ncsm = 180
+        ncwm = 180
+        ncsp = 180
+        ncwp = 180
+        ntsu[3] = 180
+        ntwi[3] = 180
+        skipTo1420 = True
+    elif nd[1] == 360:
+        skipTo1420 = True
+    elif nd[1] == 0:
+        tu = -1
+        sib = ib
         x = 3
-        swm = (msw != 0)
+        swm = True  # swm = tu != 0
 
-        # Java source: 2150
+        ns = [0] * 5
+        ns[x] = 0
+        ifin = 0
+        sw = 0
+        si = 0
+        max = 0
+        siz = sib + sir - 1
 
         for n in range(sib, siz + 1):
             n1 = n + 1
@@ -1453,7 +1561,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
             if swm:
                 if iday[si] == x:
-                    if iday[xi] != iday[n1]:
+                    if iday[si] != iday[n1]:
                         if sw != 0:
                             ns[x] += 1
                             if ns[x] > max:
@@ -1488,527 +1596,446 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 else:
                     continue
 
-            if sw != 0:
-                ifin = ns[x]
-            if ifin > max:
-                max = ifin
+        if sw != 0:
+            ifin = ns[x]
+        if ifin > max:
+            max = ifin
 
-            # Original Source Line: GOSUB 2160 returns to 1290
+        # Original Source Line: Return from GOSUB 2160
 
-            nccm = max
-            tu = 0
-            skipTo1420 = False
+        ncsp = max
+        sib = ic
+        sir = 180
+        swm = (tu != 0)
 
-            if nd[3] == 360:
-                ncsm = 180
-                ncwm = 180
-                ncsp = 180
-                ncwp = 180
-                ntsu[3] = 180
-                ntwi[3] = 180
-                skipTo1420 = True
-            elif nd[1] == 360:
-                skipTo1420 = True
-            elif nd[1] == 0:
-                tu = -1
-                sib = ib
-                x = 3
-                swm = True  # swm = tu != 0
+        ns = [0] * 5
+        ns[x] = 0
+        ifin = 0
+        sw = 0
+        si = 0
+        max = 0
+        siz = sib + sir - 1
 
-                ns = [0] * 5
-                ns[x] = 0
-                ifin = 0
-                sw = 0
-                si = 0
-                max = 0
-                siz = sib + sir - 1
+        # Another n loop.
 
-                for n in range(sib, siz + 1):
-                    n1 = n + 1
-                    if n1 > 360:
-                        n1 -= 360
-                    if n > 360:
-                        si = n - 360
-                    else:
-                        si = n
-
-                    if swm:
-                        if iday[si] == x:
-                            if iday[si] != iday[n1]:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-                    else:
-                        if iday[si] != x:
-                            if iday[n1] == x:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-
-                if sw != 0:
-                    ifin = ns[x]
-                if ifin > max:
-                    max = ifin
-
-                # Original Source Line: Return from GOSUB 2160
-
-                ncsp = max
-                sib = ic
-                sir = 180
-                swm = (tu != 0)
-
-                ns = [0] * 5
-                ns[x] = 0
-                ifin = 0
-                sw = 0
-                si = 0
-                max = 0
-                siz = sib + sir - 1
-
-                # Another n loop.
-
-                for n in range(sib, siz + 1):
-                    n1 = n + 1
-                    if n1 > 360:
-                        n1 -= 360
-                    if n > 360:
-                        si = n - 360
-                    else:
-                        si = n
-
-                    if swm:
-                        if iday[si] == x:
-                            if iday[si] != iday[n1]:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-                    else:
-                        if iday[si] != x:
-                            if iday[n1] == x:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-
-                if sw != 0:
-                    ifin = ns[x]
-                if ifin > max:
-                    max = ifin
-
-                ncwp = max
-
+        for n in range(sib, siz + 1):
+            n1 = n + 1
+            if n1 > 360:
+                n1 -= 360
+            if n > 360:
+                si = n - 360
             else:
-                # Original Source Line: 1330
-                tu = 0
-                sib = ib
-                sir = 180
-                x = 1
-                swm = False
+                si = n
 
-                ns = [0] * 5
-                ns[x] = 0
-                ifin = 0
-                sw = 0
-                si = 0
-                max = 0
-                siz = sib + sir - 1
-
-                # Another n loop.
-                for n in range(sib, siz + 1):
-                    n1 = n + 1
-                    if n1 > 360:
-                        n1 -= 360
-                    if n > 360:
-                        si = n - 360
-                    else:
-                        si = n
-
-                    if swm:
-                        if iday[si] == x:
-                            if iday[si] != iday[n1]:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
+            if swm:
+                if iday[si] == x:
+                    if iday[si] != iday[n1]:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
                         else:
                             continue
                     else:
-                        if iday[si] != x:
-                            if iday[n1] == x:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-                # End of n loop.
-
-                if sw != 0:
-                    ifin = ns[x]
-
-                if ifin > max:
-                    max = ifin
-
-                ncsm = max
-                sib = ic
-
-                # Java Source: 2631
-
-                ns = [0] * 5
-                ns[x] = 0
-                ifin = 0
-                sw = 0
-                si = 0
-                max = 0
-                siz = sib + sir - 1
-
-                # Another n loop.
-                for n in range(sib, siz + 1):
-                    n1 = n + 1
-                    if n1 > 360:
-                        n1 -= 360
-                    if n > 360:
-                        si = n - 360
-                    else:
-                        si = n
-
-                    if swm:
-                        if iday[si] == x:
-                            if iday[si] != iday[n1]:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-                    else:
-                        if iday[si] != x:
-                            if iday[n1] == x:
-                                if sw != 0:
-                                    ns[x] += 1
-                                    if ns[x] > max:
-                                        max = ns[x]
-                                    ns[x] = 0
-                                    sw = 0
-                                    continue
-                                else:
-                                    continue
-                            else:
-                                ns[x] += 1
-                                sw = -1
-                                continue
-                        else:
-                            continue
-                # End of n loop.
-
-                if sw != 0:
-                    ifin = ns[x]
-                if ifin > max:
-                    max = ifin
-                ncwm = max
-
-            # Original Source Line: 1400
-
-            jb = 0
-            jr = 0
-            je = 0
-            if not skipTo1420:
-                jb = ib
-                jr = 180
-                nzd = [0.0] * 4
-                je = jb + jr - 1
-
-                for l in range(jb, je + 1):
-                    j = l
-                    if j > 360:
-                        j -= 360
-                    ik = iday[j]
-                    nzd[ik] += 1
-
-                for i in range(1, 4):
-                    ntsu[i] = nzd[i]
-                    ntwi[i] = nd[i] + ntsu[i]
-
-            # Actual model calendar is 360 days.
-            ntd = [0] * 365
-
-            if not tempUnder8C:
-                # Fill calendar with 8's before mutating further,
-                # if we have no temperatures under 8 degrees C.
-                # Hacked to parallel original model logic.
-                ntd = [8] * 365
-
-            if tc != 0 or tu != 0:
-                # Calculate and fill calendar.
-                kl = "$-58" # Array of calendar values.
-                kr = [0.0] * 25
-                m = [0] * 25
-                kt = 0
-
-                if nbd[1] < 0 and nbd8[1] < 0:
-                    for i in range(1, 361):
-                        ntd[i] = kl[1]
-                elif nbd[1] == 0 and nbd8[1] < 0:
-                    for i in range(1, 361):
-                        ntd[i] = kl[2]
+                        ns[x] += 1
+                        sw = -1
+                        continue
                 else:
-                    if nbd8[1] < 0:
-                        nbd8[1] = 0
-                    for i in range(1, 7):
-                        kr[i] = nbd[i]
-                        m[i] = 2
-                    for i in range(7, 13):
-                        kt = i - 6
-                        if ned[kt] != 0:
-                            kr[i] = ned[kt] + 1
-                            if kr[i] > 360:
-                                kr[i] = 1
-                            m[i] = 1
-
-                    for i in range(13, 19):
-                        kt = i - 12
-                        kr[i] = nbd8[kt]
-                        m[i] = 3
-
-                    for i in range(19, 25):
-                        kt = i - 18
-                        if ned8[kt] != 0:
-                            kr[i] = ned8[kt] + 1
-                            if kr[i] > 360:
-                                kr[i] = 1
-                            m[i] = 2
-
-                    nt = 23
-                    stt = 0
-                    itemp = 0.0
-                    itm = 0
-
-                    # Original Source Line: 3140
-
-                    for i in range(1, 24):
-                        stt = 0
-
-                        for j in range(1, nt + 1):
-                            if not (kr[j] <= kr[j + 1]):
-                                itemp = kr[j]
-                                itm = m[j]
-                                kr[j] = kr[j + 1]
-                                m[j] = m[j + 1]
-                                kr[j + 1] = itemp
-                                m[j + 1] = itm
-                                stt = -1
-
-                        if stt == 0:
-                            break
-                        else:
-                            nt -= 1
-
-                    ima = m[24]
-                    nul = 0
-
-                    for i in range(1, 25):
-                        if kr[i] == 0:
-                            nul += 1
-
-                    kk = 0
-                    for i in range(1, 25):
-                        kk = i
-                        ipl = i + nul
-                        if ipl > 24:
-                            break
-                        else:
-                            kr[i] = kr[ipl]
-                            m[i] = m[ipl]
-
-                    for i in range(kk, 25):
-                        kr[i] = 0
-
-                    if kr[1] != 1:
-                        ie = int(kr[1] - 1)
-                        for i in range(1, ie + 1):
-                            ntd[i] = kl[ima]
-
-                    ns2 = 0
-                    nn = 24 - nul
-                    for i in range(1, nn + 1):
-                        ns2 = m[i]
-                        ib = int(kr[i])
-                        ie = int(kr[i + 1] - 1)
-                        if kr[i + 1] == 0:
-                            ie = 360
-
-                        for j in range(ib, ie + 1):
-                            ntd[j] = kl[ns2]
-
-            # Regime determination time!
-            # Original source line: 1430 -> GOSUB 3390
-
-            ans = " "
-            div = " "
-            q = " "
-            if swt != 0:
-                ans = "Perudic"
-                ncsm = 180
-                ncwm = 180
-                ncsp = 180
-                ntsu[3] = 180
-                ntwi[3] = 180
-            elif nsd[1] > (lt5c / 2) and ncpm[2] < 90:
-                ans = "Aridic"
-                if nd[1] == 360:
-                    q = "Extreme"
-                elif ncpm[2] <= 45:
-                    q = "Typic"
-                else:
-                    q = "Weak"
-                    div = ans
-            elif tma < 22 and dif >= 5 and nccd >= 45 and nccm >= 45:
-                ans = "Xeric"
-                if nccd > 90:
-                    q = "Dry"
-                else:
-                    q = "Typic"
-                div = ans
-            elif nd[1] + nd[2] < 90:
-                ans = "Udic"
-                if nd[1] + nd[2] < 30:
-                    q = "Typic"
-                    div = ans
-                else:
-                    q = "Dry"
-                    if div < 5:
-                        div = "Tropudic"
-                    else:
-                        div = "Tempudic"
-            elif trr != "Pergelic" and trr != "Cryic":
-                ans = "Ustic"
-                if div >= 5:
-                    div = "Tempustic"
-                    if nccm <= 45:
-                        q = "Typic"
-                    elif nccd > 45:
-                        q = "Xeric"
-                    else:
-                        q = "Wet"
-                else:
-                    div = "Tropustic"
-                    if ncpm[2] < 180:
-                        q = "Aridic"
-                    elif ncpm[2] < 270:
-                        q = "Typic"
-                    else:
-                        q = "Udic"
+                    continue
             else:
-                ans = "Undefined"
-                div = ans
+                if iday[si] != x:
+                    if iday[n1] == x:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
 
-            # Original source line: Return from GOSUB 3390
+        if sw != 0:
+            ifin = ns[x]
+        if ifin > max:
+            max = ifin
 
-            # Calculate water balances for year/summer.
-            awb = compute_water_balance(precip, mpe, False, 
-                dataset.get("ns_hemisphere") == "N")
-            swb = compute_water_balance(precip, mpe, True, 
-                dataset.get("ns_hemisphere") == "N")
+        ncwp = max
 
-            rr_dict = {
-                "annual_rainfall": "",
-                "water_holding_capacity": "",
-                "annual_water_balance": "",
-                "summer_water_balance": "",
-                "mean_potential_evapotranspiration": "",
-                "days_dry_after_summer_solstice": "",
-                "moist_days_after_winter_solstice": "",
-                "num_cumulative_days_dry": "",
-                "num_cumulative_days_moist_dry": "",
-                "num_cumulative_days_moist": "",
-                "num_cumulative_days_dry_over_5c": "",
-                "num_cumulative_days_moist_dry_over_5c": "",
-                "num_cumulative_days_moist_over_5c": "",
-                "num_consecutive_days_moist_someplaces": "",
-                "num_consecutive_days_moist_over_8c_someplaces": "",
-                "temperature_calendar": "",
-                "moisture_calendar": "",
-                "nsd": "",
-                "ncpm": "",
-                "temperature_regime": "",
-                "moisture_regime:": "",
-                "regime_subdivision_1": "",
-                "regime_subdivision_2": ""
-            }
+    else:
+        # Original Source Line: 1330
+        tu = 0
+        sib = ib
+        sir = 180
+        x = 1
+        swm = False
+
+        ns = [0] * 5
+        ns[x] = 0
+        ifin = 0
+        sw = 0
+        si = 0
+        max = 0
+        siz = sib + sir - 1
+
+        # Another n loop.
+        for n in range(sib, siz + 1):
+            n1 = n + 1
+            if n1 > 360:
+                n1 -= 360
+            if n > 360:
+                si = n - 360
+            else:
+                si = n
+
+            if swm:
+                if iday[si] == x:
+                    if iday[si] != iday[n1]:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
+            else:
+                if iday[si] != x:
+                    if iday[n1] == x:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
+        # End of n loop.
+
+        if sw != 0:
+            ifin = ns[x]
+
+        if ifin > max:
+            max = ifin
+
+        ncsm = max
+        sib = ic
+
+        # Java Source: 2631
+
+        ns = [0] * 5
+        ns[x] = 0
+        ifin = 0
+        sw = 0
+        si = 0
+        max = 0
+        siz = sib + sir - 1
+
+        # Another n loop.
+        for n in range(sib, siz + 1):
+            n1 = n + 1
+            if n1 > 360:
+                n1 -= 360
+            if n > 360:
+                si = n - 360
+            else:
+                si = n
+
+            if swm:
+                if iday[si] == x:
+                    if iday[si] != iday[n1]:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
+            else:
+                if iday[si] != x:
+                    if iday[n1] == x:
+                        if sw != 0:
+                            ns[x] += 1
+                            if ns[x] > max:
+                                max = ns[x]
+                            ns[x] = 0
+                            sw = 0
+                            continue
+                        else:
+                            continue
+                    else:
+                        ns[x] += 1
+                        sw = -1
+                        continue
+                else:
+                    continue
+        # End of n loop.
+
+        if sw != 0:
+            ifin = ns[x]
+        if ifin > max:
+            max = ifin
+        ncwm = max
+
+    # Original Source Line: 1400
+
+    jb = 0
+    jr = 0
+    je = 0
+    if not skipTo1420:
+        jb = ib
+        jr = 180
+        nzd = [0.0] * 4
+        je = jb + jr - 1
+
+        for l in range(jb, je + 1):
+            j = l
+            if j > 360:
+                j -= 360
+            ik = iday[j]
+            nzd[ik] += 1
+
+        for i in range(1, 4):
+            ntsu[i] = nzd[i]
+            ntwi[i] = nd[i] + ntsu[i]
+
+    # Actual model calendar is 360 days.
+    ntd = [0] * 365
+
+    if not tempUnder8C:
+        # Fill calendar with 8's before mutating further,
+        # if we have no temperatures under 8 degrees C.
+        # Hacked to parallel original model logic.
+        ntd = [8] * 365
+
+    if tc != 0 or tu != 0:
+        # Calculate and fill calendar.
+        kl = "$-58" # Array of calendar values.
+        kr = [0.0] * 25
+        m = [0] * 25
+        kt = 0
+
+        if nbd[1] < 0 and nbd8[1] < 0:
+            for i in range(1, 361):
+                ntd[i] = kl[1]
+        elif nbd[1] == 0 and nbd8[1] < 0:
+            for i in range(1, 361):
+                ntd[i] = kl[2]
+        else:
+            if nbd8[1] < 0:
+                nbd8[1] = 0
+            for i in range(1, 7):
+                kr[i] = nbd[i]
+                m[i] = 2
+            for i in range(7, 13):
+                kt = i - 6
+                if ned[kt] != 0:
+                    kr[i] = ned[kt] + 1
+                    if kr[i] > 360:
+                        kr[i] = 1
+                    m[i] = 1
+
+            for i in range(13, 19):
+                kt = i - 12
+                kr[i] = nbd8[kt]
+                m[i] = 3
+
+            for i in range(19, 25):
+                kt = i - 18
+                if ned8[kt] != 0:
+                    kr[i] = ned8[kt] + 1
+                    if kr[i] > 360:
+                        kr[i] = 1
+                    m[i] = 2
+
+            nt = 23
+            stt = 0
+            itemp = 0.0
+            itm = 0
+
+            # Original Source Line: 3140
+
+            for i in range(1, 24):
+                stt = 0
+
+                for j in range(1, nt + 1):
+                    if not (kr[j] <= kr[j + 1]):
+                        itemp = kr[j]
+                        itm = m[j]
+                        kr[j] = kr[j + 1]
+                        m[j] = m[j + 1]
+                        kr[j + 1] = itemp
+                        m[j + 1] = itm
+                        stt = -1
+
+                if stt == 0:
+                    break
+                else:
+                    nt -= 1
+
+            ima = m[24]
+            nul = 0
+
+            for i in range(1, 25):
+                if kr[i] == 0:
+                    nul += 1
+
+            kk = 0
+            for i in range(1, 25):
+                kk = i
+                ipl = i + nul
+                if ipl > 24:
+                    break
+                else:
+                    kr[i] = kr[ipl]
+                    m[i] = m[ipl]
+
+            for i in range(kk, 25):
+                kr[i] = 0
+
+            if kr[1] != 1:
+                ie = int(kr[1] - 1)
+                for i in range(1, ie + 1):
+                    ntd[i] = kl[ima]
+
+            ns2 = 0
+            nn = 24 - nul
+            for i in range(1, nn + 1):
+                ns2 = m[i]
+                ib = int(kr[i])
+                ie = int(kr[i + 1] - 1)
+                if kr[i + 1] == 0:
+                    ie = 360
+
+                for j in range(ib, ie + 1):
+                    ntd[j] = kl[ns2]
+
+    # Regime determination time!
+    # Original source line: 1430 -> GOSUB 3390
+
+    ans = " "
+    div = " "
+    q = " "
+    if swt != 0:
+        ans = "Perudic"
+        ncsm = 180
+        ncwm = 180
+        ncsp = 180
+        ntsu[3] = 180
+        ntwi[3] = 180
+    elif nsd[1] > (lt5c / 2) and ncpm[2] < 90:
+        ans = "Aridic"
+        if nd[1] == 360:
+            q = "Extreme"
+        elif ncpm[2] <= 45:
+            q = "Typic"
+        else:
+            q = "Weak"
+            div = ans
+    elif tma < 22 and dif >= 5 and nccd >= 45 and nccm >= 45:
+        ans = "Xeric"
+        if nccd > 90:
+            q = "Dry"
+        else:
+            q = "Typic"
+        div = ans
+    elif nd[1] + nd[2] < 90:
+        ans = "Udic"
+        if nd[1] + nd[2] < 30:
+            q = "Typic"
+            div = ans
+        else:
+            q = "Dry"
+            if div < 5:
+                div = "Tropudic"
+            else:
+                div = "Tempudic"
+    elif trr != "Pergelic" and trr != "Cryic":
+        ans = "Ustic"
+        if div >= 5:
+            div = "Tempustic"
+            if nccm <= 45:
+                q = "Typic"
+            elif nccd > 45:
+                q = "Xeric"
+            else:
+                q = "Wet"
+        else:
+            div = "Tropustic"
+            if ncpm[2] < 180:
+                q = "Aridic"
+            elif ncpm[2] < 270:
+                q = "Typic"
+            else:
+                q = "Udic"
+    else:
+        ans = "Undefined"
+        div = ans
+
+    # Original source line: Return from GOSUB 3390
+
+    # Calculate water balances for year/summer.
+    awb = compute_water_balance(precip, mpe, False, 
+        dataset.get("ns_hemisphere") == "N")
+    swb = compute_water_balance(precip, mpe, True, 
+        dataset.get("ns_hemisphere") == "N")
+
+    rr_dict = {
+        "annual_rainfall": "",
+        "water_holding_capacity": "",
+        "annual_water_balance": "",
+        "summer_water_balance": "",
+        "mean_potential_evapotranspiration": "",
+        "days_dry_after_summer_solstice": "",
+        "moist_days_after_winter_solstice": "",
+        "num_cumulative_days_dry": "",
+        "num_cumulative_days_moist_dry": "",
+        "num_cumulative_days_moist": "",
+        "num_cumulative_days_dry_over_5c": "",
+        "num_cumulative_days_moist_dry_over_5c": "",
+        "num_cumulative_days_moist_over_5c": "",
+        "num_consecutive_days_moist_someplaces": "",
+        "num_consecutive_days_moist_over_8c_someplaces": "",
+        "temperature_calendar": "",
+        "moisture_calendar": "",
+        "nsd": "",
+        "ncpm": "",
+        "temperature_regime": "",
+        "moisture_regime:": "",
+        "regime_subdivision_1": "",
+        "regime_subdivision_2": ""
+    }
     ####
     logger.debug("Returning results after model run.")
     return False
