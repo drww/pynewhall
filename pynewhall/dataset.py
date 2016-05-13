@@ -131,8 +131,6 @@ class RunResult:
             "num_consecutive_days_moist_over_8c_someplaces": "",
             "temperature_calendar": "",
             "moisture_calendar": "",
-            "nsd": "",
-            "ncpm": "",
             "temperature_regime": "",
             "moisture_regime:": "",
             "regime_subdivision_1": "",

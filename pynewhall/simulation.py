@@ -2012,30 +2012,32 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         dataset.get("ns_hemisphere") == "N")
 
     rr_dict = {
-        "annual_rainfall": "",
-        "water_holding_capacity": "",
-        "annual_water_balance": "",
-        "summer_water_balance": "",
-        "mean_potential_evapotranspiration": "",
-        "days_dry_after_summer_solstice": "",
-        "moist_days_after_winter_solstice": "",
-        "num_cumulative_days_dry": "",
-        "num_cumulative_days_moist_dry": "",
-        "num_cumulative_days_moist": "",
-        "num_cumulative_days_dry_over_5c": "",
-        "num_cumulative_days_moist_dry_over_5c": "",
-        "num_cumulative_days_moist_over_5c": "",
-        "num_consecutive_days_moist_someplaces": "",
-        "num_consecutive_days_moist_over_8c_someplaces": "",
-        "temperature_calendar": "",
-        "moisture_calendar": "",
-        "nsd": "",
-        "ncpm": "",
-        "temperature_regime": "",
-        "moisture_regime:": "",
-        "regime_subdivision_1": "",
-        "regime_subdivision_2": ""
+        "annual_rainfall": arf,
+        "water_holding_capacity": whc,
+        "annual_water_balance": awb,
+        "summer_water_balance": swb,
+        "mean_potential_evapotranspiration": mpe[1:13],
+        "days_dry_after_summer_solstice": nccd,
+        "moist_days_after_winter_solstice": nccm,
+        "num_cumulative_days_dry": nd[1],
+        "num_cumulative_days_moist_dry": nd[2],
+        "num_cumulative_days_moist": nd[3],
+        "num_cumulative_days_dry_over_5c": nsd[1],
+        "num_cumulative_days_moist_dry_over_5c": nsd[2],
+        "num_cumulative_days_moist_over_5c": nsd[3],
+        "num_consecutive_days_moist_someplaces": ncpm[1],
+        "num_consecutive_days_moist_over_8c_someplaces": ncpm[2],
+        "temperature_calendar": ntd[1:361],
+        "moisture_calendar": iday[1:361],
+        "temperature_regime": trr,
+        "moisture_regime:": ans,
+        "regime_subdivision_1": div,
+        "regime_subdivision_2": q
     }
-    ####
-    logger.debug("Returning results after model run.")
-    return False
+
+    debug_report = "=" * 20 + "RESULTS" + "=" * 20
+    for key in rr_dict:
+        debug_report += "\n{} = {}".format(key, rr_dict[key])
+    logger.debug(debug_report)
+
+    return RunResult(dataset, rr_dict)
