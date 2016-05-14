@@ -908,7 +908,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 if mm < 0:
                                     mm = 0
                             ib = ie + 1
-                            nd[k] =+ igmc
+                            nd[k] += igmc
                             pmc = kk
                             k = kk
                             continue
@@ -936,7 +936,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 if mm < 0:
                     mm = 0
             ib = ie + 1
-            nd[k] =+ igmc
+            nd[k] += igmc
             continue
 
     # TODO, indent fucked
@@ -1952,6 +1952,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         ncsm = 180
         ncwm = 180
         ncsp = 180
+        ncwp = 180
         ntsu[3] = 180
         ntwi[3] = 180
     elif nsd[1] > (lt5c / 2) and ncpm[2] < 90:
@@ -1970,9 +1971,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         else:
             q = "Typic"
         div = ans
-    elif nd[1] + nd[2] < 90:
+    elif (nd[1] + nd[2]) < 90:
         ans = "Udic"
-        if nd[1] + nd[2] < 30:
+        if (nd[1] + nd[2]) < 30:
             q = "Typic"
             div = ans
         else:
@@ -2039,5 +2040,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     for key in rr_dict:
         debug_report += "\n{} = {}".format(key, rr_dict[key])
     logger.debug(debug_report)
+
+    print nd
 
     return RunResult(dataset, rr_dict)
