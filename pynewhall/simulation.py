@@ -152,20 +152,20 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         if temperature[i] > 0:
             if temperature[i] < 26.5:
                 a_base = 10 * (temperature[i] / swi)
-                upe.append(16 * (a_base ** a))
+                upe[i] = 16 * (a_base ** a)
             elif temperature[i] >= 38:
-                upe.append(185.0)
+                upe[i] = 185.0
             else:
-                for i in range(1, 13):
+                for ki in range(1, 25):
                     kl = ki + 1
                     kk = ki
                     if temperature[i] > ZT[ki - 1] and temperature[i] < ZT[kl - 1]:
-                        upe.append(ZPE[kk - 1])
+                        upe[i] = ZPE[kk - 1]
                         break
 
     # Original Source Line: 495
-    nrow = 0
     if dataset.get("ns_hemisphere").upper() == "N":
+        nrow = 0
         for i in range(1, 32):
             if dataset.get("latitude") < RN[i - 1]:
                 break
@@ -179,6 +179,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 mpe[i] = upe[i] * INZ[i - 1][nrow - 1]
 
     else:
+        nrow = 0
         for i in range(1, 14):
             if dataset.get("latitude") < RS[i - 1]:
                 break
@@ -512,13 +513,13 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     if npe <= 0:
                         break
                     else:
-                        nr = dp[i3 - 1]
+                        nr = DP[i3 - 1]
                         if sl[nr] <= 0:
                             continue
                         else:
-                            rpd = sn[nr] * dr[i3 - 1]
+                            rpd = sl[nr] * DR[i3 - 1]
                             if npe <= rpd:
-                                sl[nr] -= npe / dr[i3 - 1]
+                                sl[nr] -= npe / DR[i3 - 1]
                                 npe = 0
                             else:
                                 sl[nr] = 0
@@ -938,8 +939,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             ib = ie + 1
             nd[k] += igmc
             continue
-
-    # TODO, indent fucked
 
     # Java Source: 1327
 
