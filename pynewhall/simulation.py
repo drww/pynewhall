@@ -54,8 +54,10 @@ FS = [
 RS = [5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 42.0, 44.0, 46.0, 48.0, 50.0]
 
 FC = 2.5 # Degree offset between soil and air temperature in Celsius.
+         # TODO: Reimplement as variable with 2.5 as default.
 
 FCD = 0.66 # Soil-Air Relationship Amplitude
+           # TODO: Same deal here with FCD.
 
 CV = 5.0/9.0
 
@@ -436,8 +438,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     else:
                         esl = fsl - sl[i3]
                         if esl >= npe:
+                            sl[i3] += npe
+                            break
+                        else:
                             sl[i3] = fsl
-                            npe = npe - esl
+                            npe -= esl
                             continue
 
             # Continue for next value in im.
@@ -461,17 +466,15 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     gogr = -1
     cc = [False] * 4
     pc = [False] * 7
+
     pc[1] = sl[9] <= 0
     pc[2] = sl[17] <= 0
     pc[3] = sl[25] <= 0
-
     cc[1] = pc[1] and pc[2] and pc[3]
-    cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
-
+    cc[2] = (not cc[1]) and (pc[1] or pc[2] or pc[3])
     pc[4] = sl[9] > 0
     pc[5] = sl[17] > 0
     pc[6] = sl[25] > 0
-
     cc[3] = pc[4] and pc[5] and pc[6]
 
     for i in range(1, 4):
@@ -491,8 +494,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         pmc = k
         igmc = 0
 
-        lp = precip[im] / 2.0
-        npe = (lp - mpe[im]) / 2.0
+        lp = precip[im] / 2
+        npe = (lp - mpe[im]) / 2
         cnpe = 0.0
         skipi3Loop = False
 
@@ -534,7 +537,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             pc[2] = sl[17] <= 0
                             pc[3] = sl[25] <= 0
                             cc[1] = pc[1] and pc[2] and pc[3]
-                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+                            cc[2] = (not cc[1]) and (pc[1] or pc[2] or pc[3])
                             pc[4] = sl[9] > 0
                             pc[5] = sl[17] > 0
                             pc[6] = sl[25] > 0
@@ -556,7 +559,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             rpe = cnpe - npe
                             dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
                             igmc = dmc[k]
-                            dpmc = dmc[k] + dpmc
+                            dpmc += dmc[k]
                             dmc[k] = 0
 
                             ii = 0
@@ -583,6 +586,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             ib = ie + 1
                             nd[k] += igmc
+                            print "1: nd[{}] = {}".format(k, nd[k])
+                            print im
                             pmc = kk
                             k = kk
                             continue
@@ -611,7 +616,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             pc[2] = sl[17] <= 0
                             pc[3] = sl[25] <= 0
                             cc[1] = pc[1] and pc[2] and pc[3]
-                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+                            cc[2] = (not cc[1]) and (pc[1] or pc[2] or pc[3])
                             pc[4] = sl[9] > 0
                             pc[5] = sl[17] > 0
                             pc[6] = sl[25] > 0
@@ -647,7 +652,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
-                                    ii = ib
+                                    ii = i
                                 mm = i / 30
                                 if i % 30 == 0:
                                     mm -= 1
@@ -658,6 +663,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             ib = ie + 1
                             nd[k] += igmc
+                            print "2: nd[{}] = {}".format(k, nd[k])
+                            print im
                             pmc = kk
                             k = kk
                             continue
@@ -690,6 +697,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
         ib = ie + 1
         nd[k] += igmc
+        print "3: nd[{}] = {}".format(k, nd[k])
+        print im
 
         hp = precip[im] / 2
         for i3 in range(1, 65):
@@ -716,7 +725,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         pc[2] = sl[17] <= 0
         pc[3] = sl[25] <= 0
         cc[1] = pc[1] and pc[2] and pc[3]
-        cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+        cc[2] = (not cc[1]) and (pc[1] or pc[2] or pc[3])
         pc[4] = sl[9] > 0
         pc[5] = sl[17] > 0
         pc[6] = sl[25] > 0
@@ -727,7 +736,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 k = i
                 break
 
-        for i in range(i, 4):
+        for i in range(1, 4):
             dmc[i] = 0
             cc[i] = False
 
@@ -763,7 +772,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         else:
                             rpd = sl[nr] * DR[i3 - 1]
                             if npe <= rpd:
-                                sl[nr] -= npe / DR[i3 -1]
+                                sl[nr] -= npe / DR[i3 - 1]
                                 npe = 0
                             else:
                                 sl[nr] = 0
@@ -776,7 +785,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             pc[2] = sl[17] <= 0
                             pc[3] = sl[25] <= 0
                             cc[1] = pc[1] and pc[2] and pc[3]
-                            cc[2] = not cc[1] and(pc[1] or pc[2] or pc[3])
+                            cc[2] = (not cc[1]) and(pc[1] or pc[2] or pc[3])
                             pc[4] = sl[9] > 0
                             pc[5] = sl[17] > 0
                             pc[6] = sl[25] > 0
@@ -818,29 +827,12 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                     mm = 0
                             ib = ie + 1
                             nd[k] += igmc
+                            print "4: nd[{}] = {}".format(k, nd[k])
+                            print im
 
                             # Original Source Line: 1820 - GOSUB 1960
                             # Java Waypoint: 1115 in SimulationModel
-                            # TODO: Many repeated regions, condense.
 
-                            ii = 0
-                            mm = 0
-                            ie += igmc
-                            for i in range(ib, ie + 1):
-                                iday[i] = k
-                                if i > 30:
-                                    ii = (i % 30) - 1
-                                else:
-                                    ii = i
-                                mm = i / 30
-                                if i % 30 == 0:
-                                    mm -= 1
-                                if ii == -1:
-                                    ii = 29
-                                if mm < 0:
-                                    mm = 0
-                            ib = ie + 1
-                            nd[k] =+ igmc
                             pmc = kk
                             k = kk
                             continue
@@ -866,7 +858,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             pc[2] = sl[17] <= 0
                             pc[3] = sl[25] <= 0
                             cc[1] = pc[1] and pc[2] and pc[3]
-                            cc[2] = not cc[1] and (pc[1] or pc[2] or pc[3])
+                            cc[2] = (not cc[1]) and (pc[1] or pc[2] or pc[3])
                             pc[4] = sl[9] > 0
                             pc[5] = sl[17] > 0
                             pc[6] = sl[25] > 0
@@ -887,7 +879,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             rpe = cnpe - npe
                             dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
                             igmc = dmc[k]
-                            dpmc =+ dmc[k]
+                            dpmc += dmc[k]
                             dmc[k] = 0
 
                             # Java Source: 1241
@@ -910,35 +902,39 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                     mm = 0
                             ib = ie + 1
                             nd[k] += igmc
+                            print "5: nd[{}] = {}".format(k, nd[k])
+                            print im
                             pmc = kk
                             k = kk
                             continue
 
-            # Java Source: 1280, end of i3 loop.
+        # Java Source: 1280, end of i3 loop.
 
-            dmc[k] = 15 - dpmc
-            igmc = dmc[k]
-            dmc[k] = 0
+        dmc[k] = 15 - dpmc
+        igmc = dmc[k]
+        dmc[k] = 0
 
-            ii = 0
-            mm = 0
-            ie += igmc
-            for i in range(ib, ie + 1):
-                iday[i] = k
-                if i > 30:
-                    ii = (i % 30) - 1
-                else:
-                    ii = i
-                mm = i / 30
-                if (i % 30) == 0:
-                    mm -= 1
-                if ii == -1:
-                    ii = 29
-                if mm < 0:
-                    mm = 0
-            ib = ie + 1
-            nd[k] += igmc
-            continue
+        ii = 0
+        mm = 0
+        ie += igmc
+        for i in range(ib, ie + 1):
+            iday[i] = k
+            if i > 30:
+                ii = (i % 30) - 1
+            else:
+                ii = i
+            mm = i / 30
+            if (i % 30) == 0:
+                mm -= 1
+            if ii == -1:
+                ii = 29
+            if mm < 0:
+                mm = 0
+        ib = ie + 1
+        nd[k] += igmc
+        print "6: nd[{}] = {}".format(k, nd[k])
+        print im
+        continue
 
     # Java Source: 1327
 
