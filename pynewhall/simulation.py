@@ -744,6 +744,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         cnpe = 0
         skipi3Loop = False
 
+        # Computation of mpe[] is now complete, verified as working.
+
         if npe < 0:
             npe *= -1
             cnpe = npe
@@ -804,8 +806,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             ii = 0
                             mm = 0
-                            ie =+ igmc
+                            ie += igmc
+                            print "i loop follows"
+                            print "  ib = {}, ie = {}".format(ib, ie)
                             for i in range(ib, ie + 1):
+                                print "  i = {}".format(i)
                                 iday[i] = k
                                 if i > 30:
                                     ii = (i % 30) - 1
@@ -1819,7 +1824,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         # Fill calendar with 8's before mutating further,
         # if we have no temperatures under 8 degrees C.
         # Hacked to parallel original model logic.
-        ntd = [8] * 365
+        for i in range(1, 361):
+            ntd[i] = "8"
 
     if tc != 0 or tu != 0:
         # Calculate and fill calendar.
