@@ -158,6 +158,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
             elif temperature[i] >= 38:
                 upe[i] = 185.0
             else:
+                kl = 0
+                kk = 0
                 for ki in range(1, 25):
                     kl = ki + 1
                     kk = ki
@@ -586,8 +588,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             ib = ie + 1
                             nd[k] += igmc
-                            print "1: nd[{}] = {}".format(k, nd[k])
-                            print im
                             pmc = kk
                             k = kk
                             continue
@@ -663,8 +663,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             ib = ie + 1
                             nd[k] += igmc
-                            print "2: nd[{}] = {}".format(k, nd[k])
-                            print im
                             pmc = kk
                             k = kk
                             continue
@@ -697,8 +695,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
         ib = ie + 1
         nd[k] += igmc
-        print "3: nd[{}] = {}".format(k, nd[k])
-        print im
 
         hp = precip[im] / 2
         for i3 in range(1, 65):
@@ -827,8 +823,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                     mm = 0
                             ib = ie + 1
                             nd[k] += igmc
-                            print "4: nd[{}] = {}".format(k, nd[k])
-                            print im
 
                             # Original Source Line: 1820 - GOSUB 1960
                             # Java Waypoint: 1115 in SimulationModel
@@ -902,8 +896,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                     mm = 0
                             ib = ie + 1
                             nd[k] += igmc
-                            print "5: nd[{}] = {}".format(k, nd[k])
-                            print im
                             pmc = kk
                             k = kk
                             continue
@@ -932,8 +924,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 mm = 0
         ib = ie + 1
         nd[k] += igmc
-        print "6: nd[{}] = {}".format(k, nd[k])
-        print im
         continue
 
     # Java Source: 1327
@@ -2032,10 +2022,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     }
 
     debug_report = "=" * 20 + "RESULTS" + "=" * 20
-    for key in rr_dict:
+    for key in sorted(rr_dict.keys()):
         debug_report += "\n{} = {}".format(key, rr_dict[key])
     logger.debug(debug_report)
-
-    print nd
 
     return RunResult(dataset, rr_dict)
