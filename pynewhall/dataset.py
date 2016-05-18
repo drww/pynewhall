@@ -114,8 +114,8 @@ class RunResult:
         # Store original dataset, merge in result_map.
         self.dataset = data_set
         self.rr_dict = {
-            "annual_rainfall": "",
-            "water_holding_capacity": "",
+            "annual_rainfall_mm": "",
+            "water_holding_capacity_mm": "",
             "annual_water_balance": "",
             "summer_water_balance": "",
             "mean_potential_evapotranspiration": "",
@@ -134,12 +134,14 @@ class RunResult:
             "temperature_regime": "",
             "moisture_regime:": "",
             "regime_subdivision_1": "",
-            "regime_subdivision_2": ""
+            "regime_subdivision_2": "",
+            "soil_air_offset_c": "",
+            "soil_air_amplitude": ""
         }
 
         try:
             # Verify all keys are present.
             for key in self.rr_dict:
-                self.rr_dict[key] = result_map
+                self.rr_dict[key] = result_map[key]
         except KeyError as ex:
             raise Exception("Input is missing property: {}".format(ex))

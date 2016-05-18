@@ -53,11 +53,8 @@ FS = [
 
 RS = [5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 42.0, 44.0, 46.0, 48.0, 50.0]
 
-FC = 2.5 # Degree offset between soil and air temperature in Celsius.
-         # TODO: Reimplement as variable with 2.5 as default.
-
-FCD = 0.66 # Soil-Air Relationship Amplitude
-           # TODO: Same deal here with FCD.
+FC = 2.5    # Degree offset between soil and air temperature in Celsius.
+FCD = 0.66  # Soil-Air Relationship Amplitude
 
 CV = 5.0/9.0
 
@@ -1998,8 +1995,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         dataset.get("ns_hemisphere") == "N")
 
     rr_dict = {
-        "annual_rainfall": arf,
-        "water_holding_capacity": whc,
+        "annual_rainfall_mm": arf,
+        "water_holding_capacity_mm": whc,
         "annual_water_balance": awb,
         "summer_water_balance": swb,
         "mean_potential_evapotranspiration": mpe[1:13],
@@ -2018,7 +2015,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         "temperature_regime": trr,
         "moisture_regime:": ans,
         "regime_subdivision_1": div,
-        "regime_subdivision_2": q
+        "regime_subdivision_2": q,
+        "soil_air_offset_c": fc,
+        "soil_air_amplitude": fcd
     }
 
     debug_report = "=" * 20 + "RESULTS" + "=" * 20
