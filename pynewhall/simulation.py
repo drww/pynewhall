@@ -807,10 +807,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ii = 0
                             mm = 0
                             ie += igmc
-                            print "i loop follows"
-                            print "  ib = {}, ie = {}".format(ib, ie)
                             for i in range(ib, ie + 1):
-                                print "  i = {}".format(i)
                                 iday[i] = k
                                 if i > 30:
                                     ii = (i % 30) - 1
