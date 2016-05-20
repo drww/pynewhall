@@ -1063,7 +1063,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                 for ij in range(1, 4):
                     nzd[ij] = 0
-                print "nzd zeroed A"
 
                 je = jb + jr - 1
 
@@ -1073,9 +1072,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         j -= 360
                     ik = int(iday[j])
                     nzd[ik] += 1
-                    print "nzd[{}] = {}".format(ik, nzd[ik])
-
-                print "nzd loop ended"
 
                 if not hasRunAlready:
                     for ic in range(1, 4):
@@ -1805,7 +1801,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         jb = ib
         jr = 180
         nzd = [0.0] * 4
-        print "nzd zeroed B"
         je = jb + jr - 1
 
         for l in range(jb, je + 1):
@@ -1814,7 +1809,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 j -= 360
             ik = iday[j]
             nzd[ik] += 1
-            print "nzd[{}] = {}".format(ik, nzd[ik])
 
         for i in range(1, 4):
             ntsu[i] = nzd[i]
