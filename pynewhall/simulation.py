@@ -1004,8 +1004,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     crr)) / (temperature[m1] - temperature[m2]))
                 if nj[kj] > 360:
                     nj[kj] -= 360
-                    kj += 1
-                    zwt = False
+                kj += 1
+                zwt = False
                 continue
             else:
                 continue
@@ -1020,7 +1020,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         # Original Source Line: 2700
         # Java Source Line: 1450
 
-        npj = (kj - 1) / 2
+        npj = int((kj - 1) / 2)
         nbj = [0] * 7
         nej = [0] * 7
         for i in range(1, npj + 1):
@@ -1063,6 +1063,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                 for ij in range(1, 4):
                     nzd[ij] = 0
+                print "nzd zeroed A"
 
                 je = jb + jr - 1
 
@@ -1070,8 +1071,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     j = l
                     if j > 360:
                         j -= 360
-                    ik = iday[j]
+                    ik = int(iday[j])
                     nzd[ik] += 1
+                    print "nzd[{}] = {}".format(ik, nzd[ik])
+
+                print "nzd loop ended"
 
                 if not hasRunAlready:
                     for ic in range(1, 4):
@@ -1801,6 +1805,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         jb = ib
         jr = 180
         nzd = [0.0] * 4
+        print "nzd zeroed B"
         je = jb + jr - 1
 
         for l in range(jb, je + 1):
@@ -1809,6 +1814,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 j -= 360
             ik = iday[j]
             nzd[ik] += 1
+            print "nzd[{}] = {}".format(ik, nzd[ik])
 
         for i in range(1, 4):
             ntsu[i] = nzd[i]
