@@ -352,8 +352,10 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         cd[5] = -1
         swt = -1
 
-    for i in range(1, 11):
+    for n in range(1, 11):
+        print "n = {}".format(n)
         for im in range(1, 13):
+            print "im = {}".format(im)
             zsw = 0
             lp = precip[im] / 2
             npe = (lp - mpe[im]) / 2
@@ -485,6 +487,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     # Run month loop.
 
     for im in range(1, 13):
+        print "im = {}".format(im)
         dmc = [0] * 4
         cc = [False] * 4
 
@@ -504,7 +507,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         elif npe == 0:
             skipi3Loop = True
         else:
-            zsw = 01
+            zsw = -1
             cnpe = npe
 
         # Original Source Line: 1670
@@ -566,6 +569,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ie += igmc
                             for i in range(ib, ie + 1):
                                 iday[i] = k
+                                print "A: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
@@ -646,6 +650,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             for i in range(ib, ie + 1):
                                 iday[i] = k
+                                print "B: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
@@ -677,6 +682,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
         for i in range(ib, ie + 1):
             iday[i] = k
+            print "C: iday[{}] = {}".format(i, k)
             if i > 30:
                 ii = (i % 30) - 1
             else:
@@ -809,6 +815,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ie += igmc
                             for i in range(ib, ie + 1):
                                 iday[i] = k
+                                print "D: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
@@ -882,6 +889,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ie += igmc
                             for i in range(ib, ie + 1):
                                 iday[i] = k
+                                print "E: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
@@ -910,6 +918,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         ie += igmc
         for i in range(ib, ie + 1):
             iday[i] = k
+            print "F: iday[{}] = {}".format(i, k)
             if i > 30:
                 ii = (i % 30) - 1
             else:
@@ -925,6 +934,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         nd[k] += igmc
         continue
 
+    # End of big month IM loop.
     # Java Source: 1327
 
     sn = 0
