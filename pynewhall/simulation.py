@@ -371,12 +371,10 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         rpe = sl[nr] * DR[i3 - 1]
                         if npe <= rpe:
                             sl[nr] = sl[nr] - (npe / float(DR[i3 - 1]))
-                            print "A: sl[{}] = {}".format(nr, sl[nr])
                             npe = 0
                             break
                         else:
                             sl[nr] = 0
-                            print "Y: sl[{}] = {}".format(nr, sl[nr])
                             npe = npe - rpe
                             continue
                 else:
@@ -386,11 +384,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         esl = fsl - sl[i3]
                         if esl >= npe:
                             sl[i3] += npe
-                            print "B: sl[{}] = {}".format(i3, sl[i3])
                             break
                         else:
                             sl[i3] = fsl
-                            print "C: sl[{}] = {}".format(i3, sl[i3])
                             npe -= esl
                             continue
 
@@ -402,11 +398,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     esl = fsl - sl[i3]
                     if esl >= hp:
                         sl[i3] += hp
-                        print "D: sl[{}] = {}".format(i3, sl[i3])
                         break
                     else:
                         sl[i3] = fsl
-                        print "E: sl[{}] = {}".format(i3, sl[i3])
                         hp -= esl
                         continue
 
@@ -431,12 +425,10 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         rpe = sl[nr] * DR[i3 - 1]
                         if npe <= rpe:
                             sl[nr] -= npe / float(DR[i3 - 1])
-                            print "F: sl[{}] = {}".format(nr, sl[nr])
                             npe = 0
                             break
                         else:
                             sl[nr] = 0
-                            print "Z: sl[{}] = {}".format(nr, sl[nr])
                             npe -= rpe
                             continue
                 else:
@@ -446,11 +438,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         esl = fsl - sl[i3]
                         if esl >= npe:
                             sl[i3] += npe
-                            print "G: sl[{}] = {}".format(i3, sl[i3])
                             break
                         else:
                             sl[i3] = fsl
-                            print "H: sl[{}] = {}".format(i3, sl[i3])
                             npe -= esl
                             continue
 
@@ -532,11 +522,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             rpd = sl[nr] * DR[i3 - 1]
                             if npe <= rpd:
                                 sl[nr] -= npe / float(DR[i3 - 1])
-                                print "I: sl[{}] = {}".format(nr, sl[nr])
                                 npe = 0
                             else:
                                 sl[nr] = 0
-                                print "J: sl[{}] = {}".format(nr, sl[nr])
                                 npe -= rpd
 
                             # Original Source Line: 1750
@@ -614,11 +602,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             esl = fsl - sl[i3]
                             if esl >= npe:
                                 sl[i3] += npe
-                                print "K: sl[{}] = {}".format(i3, sl[i3])
                                 npe = 0
                             else:
                                 sl[i3] = fsl
-                                print "L: sl[{}] = {}".format(i3, sl[i3])
                                 npe -= esl
 
                             cc = [False] * 4
@@ -717,11 +703,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 esl = fsl - sl[i3]
                 if esl >= hp:
                     sl[i3] += hp
-                    print "M: sl[{}] = {}".format(i3, sl[i3])
                     break
                 else:
                     sl[i3] = fsl
-                    print "N: sl[{}] = {}".format(i3, sl[i3])
                     hp -= esl
                     continue
 
@@ -786,11 +770,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             rpd = sl[nr] * DR[i3 - 1]
                             if npe <= rpd:
                                 sl[nr] -= npe / float(DR[i3 - 1])
-                                print "O: sl[{}] = {}".format(nr, sl[nr])
                                 npe = 0
                             else:
                                 sl[nr] = 0
-                                print "P: sl[{}] = {}".format(nr, sl[nr])
                                 npe -= rpd
 
                             cc = [False] * 4
@@ -858,11 +840,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             esl = fsl - sl[i3]
                             if esl >= npe:
                                 sl[i3] += npe
-                                print "Q: sl[{}] = {}".format(i3, sl[i3])
                                 npe = 0
                             else:
                                 sl[i3] = fsl
-                                print "R: sl[{}] = {}".format(i3, sl[i3])
                                 npe -= esl
 
                             cc = [False] * 4
