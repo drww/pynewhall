@@ -63,10 +63,10 @@ DP = [8, 7, 16, 6, 15, 24, 5, 14, 23, 32, 4, 13, 22, 31, 40, 3, 12, 21, 30,
     27, 36, 45, 54, 63, 17, 26, 35, 44, 53, 62, 25, 34, 43, 52, 61, 33, 42,
     51, 60, 41, 50, 59, 49, 58, 57, 160]
 
-DR = [1., 1., 1., 1., 1.02, 1.03, 1.05, 1.07, 1.09, 1.11, 1.13, 1.15, 1.17, 1.19, 1.21, 1.23, 1.26,
+DR = [1.0, 1.0, 1.0, 1.0, 1.02, 1.03, 1.05, 1.07, 1.09, 1.11, 1.13, 1.15, 1.17, 1.19, 1.21, 1.23, 1.26,
     1.28, 1.31, 1.34, 1.37, 1.40, 1.43, 1.46, 1.49, 1.53, 1.57, 1.61, 1.65, 1.69, 1.74, 1.78,
     1.84, 1.89, 1.95, 2.01, 2.07, 2.14, 2.22, 2.30, 2.38, 2.47, 2.57, 2.68, 2.80, 2.93, 3.07,
-    3.22, 3.39, 3.58, 3.80, 4.03, 4.31, 4.62, 4.98, 5., 5., 5., 5., 5., 5., 5., 5., 5.]
+    3.22, 3.39, 3.58, 3.80, 4.03, 4.31, 4.62, 4.98, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0]
 
 # Lag phases.  21 days is used for when the soil is warming
 # up, and 10 days for when the soil is cooling off.
@@ -118,7 +118,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         elevation *= 0.305
         for i in range(1, 13):
             # Convert F to C, inches to millimeters.
-            temperature[i] = 5.0/9.0 * (temperature[i] - 32)
+            temperature[i] = CV * (temperature[i] - 32)
             precip[i] = precip[i] * 25.4
 
     # Initialize aggregator calendars and var.
@@ -133,7 +133,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     # mwi = (temp/5)**1.514  If not, store zero.
     for i in range(1, 13):
         if temperature[i] > 0:
-            mwi_val = (temperature[i] / 5) ** 1.514
+            mwi_val = (temperature[i] / 5.0) ** 1.514
             mwi.append(mwi_val)
             swi += mwi_val
         else:
@@ -150,7 +150,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     for i in range(1, 13):
         if temperature[i] > 0:
             if temperature[i] < 26.5:
-                a_base = 10 * (temperature[i] / swi)
+                a_base = 10 * (temperature[i] / float(swi))
                 upe[i] = 16 * (a_base ** a)
             elif temperature[i] >= 38:
                 upe[i] = 185.0
@@ -196,7 +196,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 else:
                     cf = ((FS[i - 1][nrow] - FS[i - 1][nrow - 1]) * (((dataset.get("latitude_deg") - \
                         RS[nrow - 1]) * 60) + dataset.get("latitude_min"))) / \
-                        ((RS[nrow] - RS[nrow - 1]) * 60)
+                        float((RS[nrow] - RS[nrow - 1]) * 60)
                     cf += FS[i - 1][nrow - 1]
                     mpe[i] = upe[i] * cf
         else:
@@ -206,7 +206,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     continue
                 else:
                     cf = (FS[i - 1][0] - INZ[i - 1][0]) * (dataset.get("latitude_deg") * 60 + \
-                        dataset.get("latitude_min")) / 300
+                        dataset.get("latitude_min")) / 300.0
                     cf += INZ[i - 1][0]
                     mpe[i] = upe[i] * cf
 
@@ -224,9 +224,9 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     for i in range(1, 13):
         sumt += temperature[i]
 
-    tma = sumt / 12 + fc
-    at1 = (temperature[6] + temperature[7] + temperature[8]) / 3 + fc
-    at2 = (temperature[1] + temperature[2] + temperature[12]) / 3 + fc
+    tma = sumt / 12.0 + fc
+    at1 = (temperature[6] + temperature[7] + temperature[8]) / 3.0 + fc
+    at2 = (temperature[1] + temperature[2] + temperature[12]) / 3.0 + fc
 
     st = 0
     wt = 0
@@ -238,7 +238,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
       wt = at1
 
     dif = abs(at1 - at2)
-    cs = dif * (1 - fcd) / 2
+    cs = dif * (1 - fcd) / 2.0
 
     # Original Source Line: 680
 
@@ -288,7 +288,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     # Original Source Line: 50 ("STORVAR5")
 
     whc = water_holding_capacity
-    fsl = whc / 64
+    fsl = whc / 64.0
     sl = [0.0] * 65
 
     k = 1
@@ -353,12 +353,10 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         swt = -1
 
     for n in range(1, 11):
-        print "n = {}".format(n)
         for im in range(1, 13):
-            print "im = {}".format(im)
             zsw = 0
-            lp = precip[im] / 2
-            npe = (lp - mpe[im]) / 2
+            lp = precip[im] / 2.0
+            npe = (lp - mpe[im]) / 2.0
             if npe <= 0:
                 npe = 0 - npe
             else:
@@ -372,11 +370,13 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     else:
                         rpe = sl[nr] * DR[i3 - 1]
                         if npe <= rpe:
-                            sl[nr] = sl[nr] - (npe / DR[i3 - 1])
+                            sl[nr] = sl[nr] - (npe / float(DR[i3 - 1]))
+                            print "A: sl[{}] = {}".format(nr, sl[nr])
                             npe = 0
                             break
                         else:
                             sl[nr] = 0
+                            print "Y: sl[{}] = {}".format(nr, sl[nr])
                             npe = npe - rpe
                             continue
                 else:
@@ -386,13 +386,15 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         esl = fsl - sl[i3]
                         if esl >= npe:
                             sl[i3] += npe
+                            print "B: sl[{}] = {}".format(i3, sl[i3])
                             break
                         else:
                             sl[i3] = fsl
+                            print "C: sl[{}] = {}".format(i3, sl[i3])
                             npe -= esl
                             continue
 
-            hp = precip[im] / 2
+            hp = precip[im] / 2.0
             for i3 in range(1, 65):
                 if sl[i3] >= fsl:
                     continue
@@ -400,17 +402,19 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     esl = fsl - sl[i3]
                     if esl >= hp:
                         sl[i3] += hp
+                        print "D: sl[{}] = {}".format(i3, sl[i3])
                         break
                     else:
                         sl[i3] = fsl
+                        print "E: sl[{}] = {}".format(i3, sl[i3])
                         hp -= esl
                         continue
 
             # Original Source Line: 2750
 
             zsw = 0
-            lp = precip[im] / 2
-            npe = (lp - mpe[im]) / 2
+            lp = precip[im] / 2.0
+            npe = (lp - mpe[im]) / 2.0
             if npe <= 0:
                 npe = 0 - npe
             else:
@@ -426,11 +430,13 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                     else:
                         rpe = sl[nr] * DR[i3 - 1]
                         if npe <= rpe:
-                            sl[nr] -= npe / DR[i3 - 1]
+                            sl[nr] -= npe / float(DR[i3 - 1])
+                            print "F: sl[{}] = {}".format(nr, sl[nr])
                             npe = 0
                             break
                         else:
                             sl[nr] = 0
+                            print "Z: sl[{}] = {}".format(nr, sl[nr])
                             npe -= rpe
                             continue
                 else:
@@ -440,9 +446,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         esl = fsl - sl[i3]
                         if esl >= npe:
                             sl[i3] += npe
+                            print "G: sl[{}] = {}".format(i3, sl[i3])
                             break
                         else:
                             sl[i3] = fsl
+                            print "H: sl[{}] = {}".format(i3, sl[i3])
                             npe -= esl
                             continue
 
@@ -455,7 +463,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         for it in range(1, 65):
             tmoi += sl[it]
 
-        if abs(tmoi - prmo) < (prmo / 100):
+        if abs(tmoi - prmo) < (prmo / 100.0):
             break
         else:
             prmo = tmoi
@@ -487,7 +495,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     # Run month loop.
 
     for im in range(1, 13):
-        print "im = {}".format(im)
         dmc = [0] * 4
         cc = [False] * 4
 
@@ -496,8 +503,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         pmc = k
         igmc = 0
 
-        lp = precip[im] / 2
-        npe = (lp - mpe[im]) / 2
+        lp = precip[im] / 2.0
+        npe = (lp - mpe[im]) / 2.0
         cnpe = 0.0
         skipi3Loop = False
 
@@ -524,10 +531,12 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         else:
                             rpd = sl[nr] * DR[i3 - 1]
                             if npe <= rpd:
-                                sl[nr] -= npe / DR[i3 - 1]
+                                sl[nr] -= npe / float(DR[i3 - 1])
+                                print "I: sl[{}] = {}".format(nr, sl[nr])
                                 npe = 0
                             else:
                                 sl[nr] = 0
+                                print "J: sl[{}] = {}".format(nr, sl[nr])
                                 npe -= rpd
 
                             # Original Source Line: 1750
@@ -552,6 +561,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             kk = k
                             k = pmc
+
                             if kk == pmc:
                                 continue
 
@@ -559,7 +569,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 break
 
                             rpe = cnpe - npe
-                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            dmc[k] = int(((15 * rpe) / float(cnpe)) - dpmc)
                             igmc = dmc[k]
                             dpmc += dmc[k]
                             dmc[k] = 0
@@ -569,7 +579,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ie += igmc
                             for i in range(ib, ie + 1):
                                 iday[i] = k
-                                print "A: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
@@ -577,7 +586,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                                 # Original Source Line: 1990
 
-                                mm = i / 30
+                                mm = i / 30.0
                                 if i % 30 == 0:
                                     mm -= 1
 
@@ -605,9 +614,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             esl = fsl - sl[i3]
                             if esl >= npe:
                                 sl[i3] += npe
+                                print "K: sl[{}] = {}".format(i3, sl[i3])
                                 npe = 0
                             else:
                                 sl[i3] = fsl
+                                print "L: sl[{}] = {}".format(i3, sl[i3])
                                 npe -= esl
 
                             cc = [False] * 4
@@ -630,6 +641,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             kk = k
                             k = pmc
+
                             if kk == pmc:
                                 continue
 
@@ -637,7 +649,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 break
 
                             rpe = cnpe - npe
-                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            dmc[k] = int(((15 * rpe) / float(cnpe)) - dpmc)
                             igmc = dmc[k]
                             dpmc += dmc[k]
                             dmc[k] = 0
@@ -650,12 +662,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
                             for i in range(ib, ie + 1):
                                 iday[i] = k
-                                print "B: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
                                     ii = i
-                                mm = i / 30
+                                mm = i / 30.0
                                 if i % 30 == 0:
                                     mm -= 1
                                 if ii == -1:
@@ -682,13 +693,12 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
         for i in range(ib, ie + 1):
             iday[i] = k
-            print "C: iday[{}] = {}".format(i, k)
             if i > 30:
                 ii = (i % 30) - 1
             else:
                 ii = i
             # TODO: Remove 1990 dupes.
-            mm = i / 30
+            mm = i / 30.0
             if i % 30 == 0:
                 mm -= 1
             if ii == -1:
@@ -699,7 +709,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         ib = ie + 1
         nd[k] += igmc
 
-        hp = precip[im] / 2
+        hp = precip[im] / 2.0
         for i3 in range(1, 65):
             if sl[i3] >= fsl:
                 continue
@@ -707,9 +717,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 esl = fsl - sl[i3]
                 if esl >= hp:
                     sl[i3] += hp
+                    print "M: sl[{}] = {}".format(i3, sl[i3])
                     break
                 else:
                     sl[i3] = fsl
+                    print "N: sl[{}] = {}".format(i3, sl[i3])
                     hp -= esl
                     continue
 
@@ -745,8 +757,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         dpmc = 0
         pmc = k
 
-        lp = precip[im] / 2
-        npe = (lp - mpe[im]) / 2
+        lp = precip[im] / 2.0
+        npe = (lp - mpe[im]) / 2.0
         cnpe = 0
         skipi3Loop = False
 
@@ -773,10 +785,12 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         else:
                             rpd = sl[nr] * DR[i3 - 1]
                             if npe <= rpd:
-                                sl[nr] -= npe / DR[i3 - 1]
+                                sl[nr] -= npe / float(DR[i3 - 1])
+                                print "O: sl[{}] = {}".format(nr, sl[nr])
                                 npe = 0
                             else:
                                 sl[nr] = 0
+                                print "P: sl[{}] = {}".format(nr, sl[nr])
                                 npe -= rpd
 
                             cc = [False] * 4
@@ -796,7 +810,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 if cc[i]:
                                     k = i
                                     break
-
                             kk = k
                             k = pmc
                             if kk == pmc:
@@ -805,7 +818,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 break
 
                             rpe = cnpe - npe
-                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            dmc[k] = int(((15 * rpe) / float(cnpe)) - dpmc)
                             igmc = dmc[k]
                             dpmc += dmc[k]
                             dmc[k] = 0
@@ -815,12 +828,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ie += igmc
                             for i in range(ib, ie + 1):
                                 iday[i] = k
-                                print "D: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
                                     ii = i
-                                mm = i / 30
+                                mm = i / 30.0
                                 if i % 30 == 0:
                                     mm -= 1
                                 if ii == -1:
@@ -846,9 +858,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             esl = fsl - sl[i3]
                             if esl >= npe:
                                 sl[i3] += npe
+                                print "Q: sl[{}] = {}".format(i3, sl[i3])
                                 npe = 0
                             else:
                                 sl[i3] = fsl
+                                print "R: sl[{}] = {}".format(i3, sl[i3])
                                 npe -= esl
 
                             cc = [False] * 4
@@ -868,7 +882,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 if cc[i]:
                                     k = i
                                     break
-
                             kk = k
                             k = pmc
                             if kk == pmc:
@@ -877,7 +890,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                                 break
 
                             rpe = cnpe - npe
-                            dmc[k] = int(((15 * rpe) / cnpe) - dpmc)
+                            dmc[k] = int(((15 * rpe) / float(cnpe)) - dpmc)
                             igmc = dmc[k]
                             dpmc += dmc[k]
                             dmc[k] = 0
@@ -889,12 +902,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                             ie += igmc
                             for i in range(ib, ie + 1):
                                 iday[i] = k
-                                print "E: iday[{}] = {}".format(i, k)
                                 if i > 30:
                                     ii = (i % 30) - 1
                                 else:
                                     ii = i
-                                mm = i / 30
+                                mm = i / 30.0
                                 if (i % 30) == 0:
                                     mm -= 1
                                 if ii == -1:
@@ -918,12 +930,11 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         ie += igmc
         for i in range(ib, ie + 1):
             iday[i] = k
-            print "F: iday[{}] = {}".format(i, k)
             if i > 30:
                 ii = (i % 30) - 1
             else:
                 ii = i
-            mm = i / 30
+            mm = i / 30.0
             if (i % 30) == 0:
                 mm -= 1
             if ii == -1:
@@ -1003,7 +1014,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
             if c[11]:
                 nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
-                    temperature[m1]) / (temperature[m2] - temperature[m1])))
+                    temperature[m1]) / float(temperature[m2] - temperature[m1])))
                 if nj[kj] > 360:
                     nj[kj] -= 360
                 kj += 1
@@ -1011,7 +1022,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 continue
             elif c[14]:
                 nj[kj] = (m0 * 30) + iz + int((30 * (temperature[m1] - 
-                    crr)) / (temperature[m1] - temperature[m2]))
+                    crr)) / float((temperature[m1] - temperature[m2])))
                 if nj[kj] > 360:
                     nj[kj] -= 360
                 kj += 1
@@ -1030,7 +1041,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         # Original Source Line: 2700
         # Java Source Line: 1450
 
-        npj = int((kj - 1) / 2)
+        npj = int((kj - 1) / 2.0)
         nbj = [0] * 7
         nej = [0] * 7
         for i in range(1, npj + 1):
@@ -1154,7 +1165,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
             if c[11]:
                 nj[kj] = (m0 * 30) + ia + int((30 * (crr - 
-                    temperature[m1]) / (temperature[m2] - temperature[m1])))
+                    temperature[m1]) / float((temperature[m2] - temperature[m1]))))
                 if nj[kj] > 360:
                     nj[kj] -= 360
                 kj += 1
@@ -1162,7 +1173,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 continue
             elif c[14]:
                 nj[kj] = (m0 * 30) + iz + int(((30 * (temperature[m1] - 
-                    crr)) / (temperature[m1] - temperature[m2])))
+                    crr)) / float((temperature[m1] - temperature[m2]))))
                 if nj[kj] > 360:
                     nj[kj] -= 360
                 kj += 1
@@ -1180,7 +1191,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 nj[i] = nj[i + 1]
             nj[le + 1] = npro
 
-        npj = int((kj - 1) / 2)
+        npj = int((kj - 1) / 2.0)
         nbj = [0] * 7
         nej = [0] * 7
         for i in range(i, npj + 1):
@@ -1950,7 +1961,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         ncwp = 180
         ntsu[3] = 180
         ntwi[3] = 180
-    elif nsd[1] > (lt5c / 2) and ncpm[2] < 90:
+    elif nsd[1] > (lt5c / 2.0) and ncpm[2] < 90:
         ans = "Aridic"
         if nd[1] == 360:
             q = "Extreme"
