@@ -1212,7 +1212,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                 # Java Source Line: 1745
 
                 for n in range(sib, siz + 1):
-
+                    print "A: ns[{}] = {}, n = {}".format(x, ns[x], n)
                     n1 = n + 1
                     if n1 > 360:
                         n1 -= 360
@@ -1290,11 +1290,6 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     x = 1
     swm = (msw != 0)
 
-    sib = ib
-    sir = 120
-    x = 1
-    swm = (msw != 0)
-
     ns = [0] * 5
     ns[x] = 0
     ifin = 0
@@ -1305,6 +1300,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     siz = sib + sir - 1
 
     for n in range(sib, siz + 1):
+        print "B: ns[{}] = {}, n = {}".format(x, ns[x], n)
         n1 = n + 1
         while n1 > 360:
             n1 -= 360
@@ -1399,6 +1395,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     siz = sib + sir - 1
 
     for n in range(sib, siz + 1):
+        print "C: ns[{}] = {}, n = {}".format(x, ns[x], n)
         n1 = n + 1
         if n1 > 360:
             n1 -= 360
@@ -1467,6 +1464,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     # Java source: 2150
 
     for n in range(sib, siz + 1):
+        print "D: ns[{}] = {}, n = {}".format(x, ns[x], n)
         n1 = n + 1
         if n1 > 360:
             n1 -= 360
@@ -1548,6 +1546,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         siz = sib + sir - 1
 
         for n in range(sib, siz + 1):
+            print "E: ns[{}] = {}, n = {}".format(x, ns[x], n)
             n1 = n + 1
             if n1 > 360:
                 n1 -= 360
@@ -1616,6 +1615,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         # Another n loop.
 
         for n in range(sib, siz + 1):
+            print "F: ns[{}] = {}, n = {}".format(x, ns[x], n)
             n1 = n + 1
             if n1 > 360:
                 n1 -= 360
@@ -1686,6 +1686,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
         # Another n loop.
         for n in range(sib, siz + 1):
+            print "G: ns[{}] = {}, n = {}".format(x, ns[x], n)
             n1 = n + 1
             if n1 > 360:
                 n1 -= 360
@@ -1753,6 +1754,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
         # Another n loop.
         for n in range(sib, siz + 1):
+            print "H: ns[{}] = {}, n = {}".format(x, ns[x], n)
             n1 = n + 1
             if n1 > 360:
                 n1 -= 360
@@ -1797,6 +1799,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
                         continue
                 else:
                     continue
+
         # End of n loop.
 
         if sw != 0:
