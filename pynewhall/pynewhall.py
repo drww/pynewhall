@@ -7,7 +7,6 @@ from simulation import run_simulation
 VERSION = 0.1
 
 # TODO: User-specified logging level.
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 def print_version():
@@ -45,9 +44,16 @@ if __name__ == "__main__":
         VERSION)
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("--version", help="show version and exit.", action="store_true")
-    parser.add_argument("--run", help="run model for argument file or directory (batch).")
+    parser.add_argument("--version", help="show version and exit", action="store_true")
+    parser.add_argument("--run", help="run model for argument file or directory (batch mode)")
+    parser.add_argument("--debug", help="report extra debugging information while running", 
+        action="store_true")
     args = parser.parse_args()
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
 
     if args.version:
         # Print version and exit succesfully.
@@ -63,3 +69,5 @@ if __name__ == "__main__":
             print ex
             exit(1)
         exit(0)
+    else:
+        print "No datasets specified, exiting.  Use --help for more details."
