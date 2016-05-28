@@ -1,6 +1,10 @@
 import json
 
 class Dataset:
+    # Holds all the data nessisary to run the model.  Lat/long, elevation,
+    # temperature, precip, and hemispheres are the bare minimum needed.
+    # Also includes a metadata dictionary should there be optional details
+    # to store that are unrelated to model operation.
 
     def get(self, key):
         return self.ds_dict[key]
@@ -37,6 +41,8 @@ class Dataset:
             "is_metric": ""
         }
         
+        # Many of these metadata properties are from the USDA's MLRA
+        # database, helping with tracking the lifecycle of input data.
         metadata_dict = {
             "station_name": "", 
             "station_id": "", 
@@ -60,8 +66,6 @@ class Dataset:
             "run_date": "", 
             "model_version": "", 
             "unit_system": "", 
-            "soil_air_offset": "",
-            "amplitude": "", 
             "network": ""
         }
 
@@ -85,9 +89,13 @@ class Dataset:
                         metadata_dict[key] = input_metadata_dict[key]
             self.ds_dict["metadata"] = metadata_dict
         except KeyError as ex:
-            raise Exception("Input is missing property: {}".format(ex))
+            raise Exception("Cannot buld dataset, input is missing property: {}".format(ex))
 
 class RunResult:
+    # Holds the results of a run of the model.  This includes temperature and moisture
+    # calendards, day counts in the moisture control section, USDA regime determination,
+    # and so forth.  Also includes the model run inputs so all variables used to generate
+    # the results are preserved.
 
     def get(self, key):
         return self.rr_dict[key]
@@ -132,7 +140,7 @@ class RunResult:
             "temperature_calendar": "",
             "moisture_calendar": "",
             "temperature_regime": "",
-            "moisture_regime:": "",
+            "moisture_regime": "",
             "regime_subdivision_1": "",
             "regime_subdivision_2": "",
             "soil_air_offset_c": "",

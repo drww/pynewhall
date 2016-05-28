@@ -38,7 +38,6 @@ def run_model(file_or_directory):
         # Not a file or directory, exit.
         raise Exception("Not a file or directory: {}".format(file_or_directory))
 
-# Main interface.
 if __name__ == "__main__":
     description = "PyNewhall {} - CLI Interface for the Newhall Simulation Model".format(
         VERSION)

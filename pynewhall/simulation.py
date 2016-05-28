@@ -1994,6 +1994,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     swb = compute_water_balance(precip, mpe, True, 
         dataset.get("ns_hemisphere") == "N")
 
+    # Build the property dictionary for a RunResult object.
     rr_dict = {
         "annual_rainfall_mm": arf,
         "water_holding_capacity_mm": whc,
@@ -2013,16 +2014,18 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         "temperature_calendar": ntd[1:361],
         "moisture_calendar": iday[1:361],
         "temperature_regime": trr,
-        "moisture_regime:": ans,
+        "moisture_regime": ans,
         "regime_subdivision_1": div,
         "regime_subdivision_2": q,
         "soil_air_offset_c": fc,
         "soil_air_amplitude": fcd
     }
 
-    debug_report = "=" * 20 + "RESULTS" + "=" * 20
+    # Verbose debug output.
+    logger.debug("Run complete, results follow.")
+    debug_report = "\n" + "=" * 20 + "RESULTS" + "=" * 20
     for key in sorted(rr_dict.keys()):
-        debug_report += "\n{} = {}".format(key, rr_dict[key])
+        debug_report += "\n    {} = {}".format(key, rr_dict[key])
     logger.debug(debug_report)
 
     return RunResult(dataset, rr_dict)
