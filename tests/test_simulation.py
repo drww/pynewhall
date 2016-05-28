@@ -102,3 +102,51 @@ def test_column97():
                 test_results[attribute])
             assert False
     assert True
+
+def test_column98():
+    # Perform a test of the MEAD89 dataset.
+    dataset_dict = {
+        "name": "Columbus 3 NE",
+        "country": "USA", 
+        "elevation": 441.96,
+        "start_year": "1998",
+        "end_year": "1998",
+        "ew_hemisphere": "W",
+        "is_metric": True,
+        "latitude": 41.4666,
+        "longitude": 97.3333,
+        "ns_hemisphere": "N", 
+        "precipitation": [17.0, 11.2, 73.4, 90.7, 64.5, 183.6, 86.6, 84.3, 28.4, 68.1, 28.4, 6.4], 
+        "temperature": [-2.8, 1.7, -0.6, 8.3, 16.1, 17.8, 24.4, 23.3, 21.1, 10.6, 5.0, -1.1]
+    }
+
+    test_ds = Dataset(dataset_dict)
+    test_results = run_simulation(test_ds).to_dict()
+
+    # Enforce that results match against this profile.
+    expected_results = {
+        "moisture_regime": "Udic",
+        "temperature_regime": "Mesic",
+        "annual_rainfall_mm": 742.6,
+        "num_cumulative_days_dry": 0,
+        "num_cumulative_days_moist_dry": 24,
+        "num_cumulative_days_moist": 336,
+        "num_cumulative_days_dry_over_5c": 0,
+        "num_cumulative_days_moist_dry_over_5c": 24,
+        "num_cumulative_days_moist_over_5c": 188,
+        "num_consecutive_days_moist_someplaces": 360,
+        "num_consecutive_days_moist_over_8c_someplaces": 196,
+        "days_dry_after_summer_solstice": 0,
+        "moist_days_after_winter_solstice": 120,
+        "mean_potential_evapotranspiration": [0.0, 3.4, 0.0, 34.4, 89.8, 102.8, 154.7, 
+            136.7, 105.3, 40.6, 13.3, 0.0]
+    }
+
+    # Review results, attribute by attribute.
+    for attribute in expected_results.keys():
+        if test_results[attribute] != expected_results[attribute]:
+            # A property does not match, abort.
+            print "Property does not match: {} = {}".format(attribute, 
+                test_results[attribute])
+            assert False
+    assert True
