@@ -26,14 +26,21 @@ def run_model(file_or_directory):
         # Run the model and catch the results.
         results = run_simulation(dataset)
         logger.debug("Simulation run complete, results: {}".format(results))
-
-        # Store report from model invocation on dataset.
-        # Check output selections.
-        # Write output file, close.
-        exit(-1)
+        return results
     elif os.path.isdir(file_or_directory):
-        logger.debug("WRITE ME!")
-        exit(-1)
+        # Gather files an directories, and perform a recursive descent
+        # into the contents, collecting results from runs.
+        root_path = os.path.abspath(file_or_directory)
+        dir_files = os.listdir(file_or_directory)
+        dir_results = []
+
+        for dir_file in dir_files:
+            # Merge results, which may be lists of results, into a single list.
+            abs_path = "{}/{}".format(root_path, dir_file)
+            dir_results += [run_model(abs_path)]
+
+        logger.debug("Processed {} dataset runs.".format(len(dir_results)))
+        return dir_results
     else:
         # Not a file or directory, exit.
         raise Exception("Not a file or directory: {}".format(file_or_directory))
@@ -62,7 +69,8 @@ if __name__ == "__main__":
     if args.run:
         try:
             # Attempt to run the model.
-            run_model(args.run)
+            all_results = run_model(args.run)
+            print all_results
         except Exception as ex:
             # Report exception message.
             print ex
