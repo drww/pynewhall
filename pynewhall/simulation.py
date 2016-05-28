@@ -1994,6 +1994,13 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
     swb = compute_water_balance(precip, mpe, True, 
         dataset.get("ns_hemisphere") == "N")
 
+    # Perform variable rounding to a single decimal place.
+    for i in range(1, 13):
+        mpe[i] = round(mpe[i], 1)
+    awb = round(awb, 1)
+    swb = round(swb, 1)
+    arf = round(arf, 1)
+
     # Build the property dictionary for a RunResult object.
     rr_dict = {
         "annual_rainfall_mm": arf,
@@ -2003,12 +2010,12 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         "mean_potential_evapotranspiration": mpe[1:13],
         "days_dry_after_summer_solstice": nccd,
         "moist_days_after_winter_solstice": nccm,
-        "num_cumulative_days_dry": nd[1],
-        "num_cumulative_days_moist_dry": nd[2],
-        "num_cumulative_days_moist": nd[3],
-        "num_cumulative_days_dry_over_5c": nsd[1],
-        "num_cumulative_days_moist_dry_over_5c": nsd[2],
-        "num_cumulative_days_moist_over_5c": nsd[3],
+        "num_cumulative_days_dry": int(nd[1]),
+        "num_cumulative_days_moist_dry": int(nd[2]),
+        "num_cumulative_days_moist": int(nd[3]),
+        "num_cumulative_days_dry_over_5c": int(nsd[1]),
+        "num_cumulative_days_moist_dry_over_5c": int(nsd[2]),
+        "num_cumulative_days_moist_over_5c": int(nsd[3]),
         "num_consecutive_days_moist_someplaces": ncpm[1],
         "num_consecutive_days_moist_over_8c_someplaces": ncpm[2],
         "temperature_calendar": ntd[1:361],
@@ -2023,9 +2030,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
     # Verbose debug output.
     logger.debug("Run complete, results follow.")
-    debug_report = "\n" + "=" * 20 + "RESULTS" + "=" * 20
+    logger.debug("=" * 20 + "RESULTS" + "=" * 20)
     for key in sorted(rr_dict.keys()):
-        debug_report += "\n    {} = {}".format(key, rr_dict[key])
-    logger.debug(debug_report)
+        logger.debug("    {} = {}".format(key, rr_dict[key]))
 
     return RunResult(dataset, rr_dict)

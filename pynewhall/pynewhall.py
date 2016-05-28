@@ -7,7 +7,7 @@ from simulation import run_simulation
 VERSION = 0.1
 
 # TODO: User-specified logging level.
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("main")
 
 def print_version():
     print "PyNewhall {}".format(VERSION)
@@ -22,6 +22,8 @@ def run_model(file_or_directory):
         # Parse into dataset.
         dataset = parse(input_file)
         logger.debug("Built dataset: {}".format(dataset.get("name")))
+        for attribute in sorted(dataset.to_dict().keys()):
+            logger.debug("    {} = {}".format(attribute, dataset.get(attribute)))
 
         # Run the model and catch the results.
         results = run_simulation(dataset)
