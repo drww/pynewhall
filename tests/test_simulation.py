@@ -47,13 +47,14 @@ def test_mead89():
     }
 
     # Review results, attribute by attribute.
+    clean_run = True
     for attribute in expected_results.keys():
         if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, abort.
+            # A property does not match, report and continue.
             print "Property does not match: {} = {}".format(attribute, 
                 test_results[attribute])
-            assert False
-    assert True
+            clean_run = False
+    assert clean_run
 
 def test_column97():
     # Perform a test of the MEAD89 dataset.
@@ -95,13 +96,14 @@ def test_column97():
     }
 
     # Review results, attribute by attribute.
+    clean_run = True
     for attribute in expected_results.keys():
         if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, abort.
+            # A property does not match, report and continue.
             print "Property does not match: {} = {}".format(attribute, 
                 test_results[attribute])
-            assert False
-    assert True
+            clean_run = False
+    assert clean_run
 
 def test_column98():
     # Perform a test of the MEAD89 dataset.
@@ -143,10 +145,60 @@ def test_column98():
     }
 
     # Review results, attribute by attribute.
+    clean_run = True
     for attribute in expected_results.keys():
         if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, abort.
+            # A property does not match, report and continue.
             print "Property does not match: {} = {}".format(attribute, 
                 test_results[attribute])
-            assert False
-    assert True
+            clean_run = False
+    assert clean_run
+
+def test_ajo2008():
+    # Perform a test of the MEAD89 dataset.
+    dataset_dict = {
+        "name": "Ajo, NZ",
+        "country": "USA", 
+        "elevation": 549.0,
+        "start_year": "1971",
+        "end_year": "2000",
+        "ew_hemisphere": "E",
+        "is_metric": True,
+        "latitude": 32.37,
+        "longitude": -112.87,
+        "ns_hemisphere": "N", 
+        "precipitation": [17.02, 17.02, 19.3, 5.84, 3.81, 1.27, 19.3, 41.15, 20.83, 16.0, 12.7, 22.35], 
+        "temperature": [12.5, 14.61, 16.78, 20.56, 24.78, 30.06, 32.17, 31.44, 29.33, 23.89, 17.22, 12.61]
+    }
+
+    test_ds = Dataset(dataset_dict)
+    test_results = run_simulation(test_ds).to_dict()
+
+    # Enforce that results match against this profile.
+    expected_results = {
+        "moisture_regime": "Aridic",
+        "temperature_regime": "Hyperthermic",
+        "annual_rainfall_mm": 196.6,
+        "num_cumulative_days_dry": 360,
+        "num_cumulative_days_moist_dry": 0,
+        "num_cumulative_days_moist": 0,
+        "num_cumulative_days_dry_over_5c": 360,
+        "num_cumulative_days_moist_dry_over_5c": 0,
+        "num_cumulative_days_moist_over_5c": 0,
+        "num_consecutive_days_moist_someplaces": 0,
+        "num_consecutive_days_moist_over_8c_someplaces": 0,
+        "days_dry_after_summer_solstice": 120,
+        "moist_days_after_winter_solstice": 0,
+        "mean_potential_evapotranspiration": [16.3, 23.8, 41.3, 74.4, 135.0, 192.9,
+            209.5, 193.2, 160.1, 100.9, 37.8, 16.3]
+    }
+
+    # Review results, attribute by attribute.
+    clean_run = True
+    for attribute in expected_results.keys():
+        if test_results[attribute] != expected_results[attribute]:
+            # A property does not match, report and continue.
+            print "Property does not match: {} = {}".format(attribute, 
+                test_results[attribute])
+            clean_run = False
+    assert clean_run
