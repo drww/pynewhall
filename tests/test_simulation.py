@@ -188,3 +188,45 @@ def test_ajo20008():
 
     # Report true/false on comparison of results and expectations.
     assert compare_results(test_results, expected_results)
+
+def test_pendleton():
+    # Perform a test of the Pendleton dataset.
+    dataset_dict = {
+        "name": "Pendleton, OR",
+        "country": "USA", 
+        "elevation": 75.0,
+        "start_year": "1971",
+        "end_year": "2000",
+        "ew_hemisphere": "E",
+        "is_metric": False,
+        "latitude": 33.3,
+        "longitude": -117.35,
+        "ns_hemisphere": "N", 
+        "precipitation": [3.00, 2.91, 2.67, 0.81, 0.32, 0.14, 0.08, 0.02, 0.14, 0.46, 0.93, 1.73], 
+        "temperature": [55.1, 56.0, 56.8, 59.6, 63.3, 66.7, 70.5, 71.9, 70.6, 65.5, 59.1, 55.2]
+    }
+
+    test_ds = Dataset(dataset_dict)
+    test_results = run_simulation(test_ds).to_dict()
+
+    # Enforce that results match against this profile.
+    expected_results = {
+        "moisture_regime": "Xeric",
+        "temperature_regime": "Thermic",
+        "annual_rainfall_mm": 335.5,
+        "num_cumulative_days_dry": 199,
+        "num_cumulative_days_moist_dry": 51,
+        "num_cumulative_days_moist": 110,
+        "num_cumulative_days_dry_over_5c": 199,
+        "num_cumulative_days_moist_dry_over_5c": 51,
+        "num_cumulative_days_moist_over_5c": 110,
+        "num_consecutive_days_moist_someplaces": 161,
+        "num_consecutive_days_moist_over_8c_someplaces": 161,
+        "days_dry_after_summer_solstice": 120,
+        "moist_days_after_winter_solstice": 75,
+        "mean_potential_evapotranspiration": [33.8, 35.3, 44.7, 56.9, 77.2, 93.1, 
+            113.3, 113.6, 96.1, 70.8, 44.5, 33.2]
+    }
+
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
