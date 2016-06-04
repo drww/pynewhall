@@ -44,7 +44,7 @@ Ran 8 tests in 0.041s
 OK
 </pre>
 
-## Example
+## Example:
 
 <pre>
 % python pynewhall/pynewhall.py --run misc/PENDLETON.json
