@@ -5,7 +5,7 @@
     "start_year": "1989",
     "end_year": "1989",
     "ew_hemisphere": "W",
-    "is_metric": false,
+    "is_metric": "False",
     "latitude": 41.166666666666664,
     "longitude": 96.41666666666667,
     "ns_hemisphere": "N", 

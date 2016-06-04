@@ -1,4 +1,4 @@
-from pynewhall.model import Dataset
+from pynewhall.dataset import Dataset
 from pynewhall.simulation import run_simulation
 
 # Nose tests for simulation component.  Invoke using

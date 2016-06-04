@@ -1,5 +1,5 @@
 import json
-from model import Dataset
+from dataset import Dataset
 
 CSV_FIELD_NAMES = ["name", "country", "latitude_degrees", "latitude_minutes", "ns_hemisphere",
         "longitude_degrees", "longitude_minutes", "ew_hemisphere", "elevation", "precipitation",

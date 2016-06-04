@@ -22,6 +22,17 @@ class Dataset:
         # Return dataset as JSON string.
         return json.dumps(self.ds_dict, sort_keys=True)
 
+    def to_report(self):
+        # Return the dataset in textual format, suitable for printing.
+        property_order = ["name", "country", "latitude", "ns_hemisphere", "longitude",
+            "ew_hemisphere", "elevation", "start_year", "end_year", "is_metric",
+            "precipitation", "temperature"]
+
+        txt_report = "========== NEWHALL DATASET ==============================================="
+        for prop in property_order:
+            txt_report += "\n  {}: {}".format(prop, self.get(prop))
+        return txt_report
+
     def __init__(self, input_dict, input_metadata_dict=None):
         # Construct a dataset given input property dictionary.  Optionally specify
         # a metadata dictionary (partial or complete) of properties.
@@ -118,6 +129,26 @@ class RunResult:
     def get_dataset(self):
         return self.dataset
 
+    def to_report(self):
+        # Return the results in textual format, suitable for printing.  Nest dataset report.
+        property_order = ["water_holding_capacity_mm", "soil_air_offset_c", "soil_air_amplitude", 
+        "annual_rainfall_mm", "annual_water_balance", "summer_water_balance", "mean_potential_evapotranspiration",
+        "days_dry_after_summer_solstice", "moist_days_after_winter_solstice", "num_cumulative_days_dry",
+        "num_cumulative_days_moist_dry", "num_cumulative_days_moist", "num_cumulative_days_dry_over_5c", 
+        "num_cumulative_days_moist_over_5c", "num_cumulative_days_moist_dry_over_5c", "num_consecutive_days_moist_someplaces", 
+        "num_consecutive_days_moist_over_8c_someplaces", "temperature_regime", "moisture_regime",
+        "regime_subdivision_1", "regime_subdivision_2"]
+
+        dataset_report = self.get_dataset().to_report()
+        txt_report = "========== NEWHALL RESULTS ==============================================="
+        for prop in property_order:
+            txt_report += "\n  {}: {}".format(prop, self.get(prop))
+        txt_report += "\n  dataset:"
+        for line in dataset_report.split("\n"):
+            # Print, with indent.
+            txt_report += "\n  {}".format(line)
+        return txt_report
+
     def __init__(self, data_set, result_map):
         # Store original dataset, merge in result_map.
         self.dataset = data_set
@@ -144,7 +175,8 @@ class RunResult:
             "regime_subdivision_1": "",
             "regime_subdivision_2": "",
             "soil_air_offset_c": "",
-            "soil_air_amplitude": ""
+            "soil_air_amplitude": "",
+            "dataset": "",
         }
 
         try:

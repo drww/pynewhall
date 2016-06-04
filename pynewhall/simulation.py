@@ -97,7 +97,7 @@ def compute_water_balance(precip, evap, only_summer, is_n_hemisphere):
 
 # Run the Newhall simulation model given argument dataset, 
 # waterholding capacity, fc (optional), and fcd (optional).
-def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
+def run_simulation(dataset, water_holding_capacity=200.0, fc=FC, fcd=FCD):
     logger.debug("Running simulation: {}".format(dataset.get("name")))
     # Begin setting up the base values for the model.
     elevation = dataset.get("elevation")
@@ -2026,7 +2026,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         "regime_subdivision_1": q,
         "regime_subdivision_2": div,
         "soil_air_offset_c": fc,
-        "soil_air_amplitude": fcd
+        "soil_air_amplitude": fcd,
+        "dataset": dataset
     }
 
     # Verbose debug output.

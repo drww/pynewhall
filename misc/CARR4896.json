@@ -3,7 +3,7 @@
 	"elevation": 1586.0,
 	"end_year": "1996",
 	"ew_hemisphere": "W",
-	"is_metric": false,
+	"is_metric": "False",
 	"latitude": 47.45,
 	"longitude": 99.13333333333334,
 	"metadata": {
