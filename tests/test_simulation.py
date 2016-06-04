@@ -5,7 +5,21 @@ from pynewhall.simulation import run_simulation
 # the "nosetests" command in the root of the project
 # directory (where the tests/ folder is).
 
-# All tests performed with default WHC, FC, and FCD.
+# Compare RunResult dicts to verify results align with expectations.
+def compare_results(test_results, expected_results):
+    clean_run = True
+    for attribute in expected_results.keys():
+        if test_results[attribute] != expected_results[attribute]:
+            # A property does not match, report and continue.
+            print "Property does not match: {} = {}".format(attribute, 
+                test_results[attribute])
+            clean_run = False
+    # Report if the test passed.
+    return clean_run
+
+# All tests performed with default WHC, FC, and FCD.  Reference
+# is Java Newhall v1.6.1, which is a faithful reimplementation
+# of the original Wambeke BASIC version.
 
 def test_mead89():
     # Perform a test of the MEAD89 dataset.
@@ -46,18 +60,11 @@ def test_mead89():
             154.7, 132.2, 80.4, 47.5, 4.4, 0.0]
     }
 
-    # Review results, attribute by attribute.
-    clean_run = True
-    for attribute in expected_results.keys():
-        if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, report and continue.
-            print "Property does not match: {} = {}".format(attribute, 
-                test_results[attribute])
-            clean_run = False
-    assert clean_run
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
 
 def test_column97():
-    # Perform a test of the MEAD89 dataset.
+    # Perform a test of the Column97 dataset.
     dataset_dict = {
         "name": "Columbus 3 NE",
         "country": "USA", 
@@ -95,18 +102,11 @@ def test_column97():
             90.5, 43.5, 4.2, 0.0]
     }
 
-    # Review results, attribute by attribute.
-    clean_run = True
-    for attribute in expected_results.keys():
-        if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, report and continue.
-            print "Property does not match: {} = {}".format(attribute, 
-                test_results[attribute])
-            clean_run = False
-    assert clean_run
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
 
 def test_column98():
-    # Perform a test of the MEAD89 dataset.
+    # Perform a test of the Column98 dataset.
     dataset_dict = {
         "name": "Columbus 3 NE",
         "country": "USA", 
@@ -144,20 +144,13 @@ def test_column98():
             136.7, 105.3, 40.6, 13.3, 0.0]
     }
 
-    # Review results, attribute by attribute.
-    clean_run = True
-    for attribute in expected_results.keys():
-        if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, report and continue.
-            print "Property does not match: {} = {}".format(attribute, 
-                test_results[attribute])
-            clean_run = False
-    assert clean_run
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
 
-def test_ajo2008():
-    # Perform a test of the MEAD89 dataset.
+def test_ajo20008():
+    # Perform a test of the Ajo20008 dataset.
     dataset_dict = {
-        "name": "Ajo, NZ",
+        "name": "Ajo, AZ",
         "country": "USA", 
         "elevation": 549.0,
         "start_year": "1971",
@@ -193,12 +186,5 @@ def test_ajo2008():
             209.5, 193.2, 160.1, 100.9, 37.8, 16.3]
     }
 
-    # Review results, attribute by attribute.
-    clean_run = True
-    for attribute in expected_results.keys():
-        if test_results[attribute] != expected_results[attribute]:
-            # A property does not match, report and continue.
-            print "Property does not match: {} = {}".format(attribute, 
-                test_results[attribute])
-            clean_run = False
-    assert clean_run
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
