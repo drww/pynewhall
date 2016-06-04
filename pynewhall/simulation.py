@@ -1442,6 +1442,7 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
 
     ns = [0] * 5
     ns[x] = 0
+    ifin = 0
     sw = 0
     si = 0
     max = 0
@@ -2022,8 +2023,8 @@ def run_simulation(dataset, water_holding_capacity=200, fc=FC, fcd=FCD):
         "moisture_calendar": iday[1:361],
         "temperature_regime": trr,
         "moisture_regime": ans,
-        "regime_subdivision_1": div,
-        "regime_subdivision_2": q,
+        "regime_subdivision_1": q,
+        "regime_subdivision_2": div,
         "soil_air_offset_c": fc,
         "soil_air_amplitude": fcd
     }

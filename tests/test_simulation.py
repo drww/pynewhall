@@ -11,8 +11,8 @@ def compare_results(test_results, expected_results):
     for attribute in expected_results.keys():
         if test_results[attribute] != expected_results[attribute]:
             # A property does not match, report and continue.
-            print "Property does not match: {} = {}".format(attribute, 
-                test_results[attribute])
+            print "Property does not match: {} = {} (should be: {})".format(attribute, 
+                test_results[attribute], expected_results[attribute])
             clean_run = False
     # Report if the test passed.
     return clean_run
