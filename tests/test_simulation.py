@@ -316,3 +316,47 @@ def test_pittsburg1950():
 
     # Report true/false on comparison of results and expectations.
     assert compare_results(test_results, expected_results)
+
+def test_piedmont1937():
+    # Perform a test of the Piedmont1937 dataset.
+    dataset_dict = {
+        "name": "Piedmont Research Station, NC",
+        "country": "USA",
+        "elevation": 158.0,
+        "start_year": "1937",
+        "end_year": "1937",
+        "ew_hemisphere": "E",
+        "is_metric": True,
+        "latitude": 38.23,
+        "longitude": 78.12,
+        "ns_hemisphere": "N",
+        "precipitation": [181.1, 65.79, 34.29, 205.49, 84.07, 144.02, 123.19, 156.21, 61.21, 200.91, 62.23, 14.48], 
+        "temperature": [5.33, 1.67, 5.83, 11.5, 18.39, 23.67, 24.83, 24.89, 18.33, 12.11, 6.61, 1.94]
+    }
+
+    test_ds = Dataset(dataset_dict)
+    test_results = run_simulation(test_ds, water_holding_capacity=154.9).to_dict()  # Non-standard WHC.
+
+    # Enforce that results match against this profile.
+    expected_results = {
+        "moisture_regime": "Udic",
+        "temperature_regime": "Thermic",
+        "regime_subdivision_1": "Typic",    # Additional checks on regime subdivisions here.
+        "regime_subdivision_2": "Udic",
+        "annual_rainfall_mm": 1333.0,
+        "num_cumulative_days_dry": 0,
+        "num_cumulative_days_moist_dry": 0,
+        "num_cumulative_days_moist": 360,
+        "num_cumulative_days_dry_over_5c": 0,
+        "num_cumulative_days_moist_dry_over_5c": 0,
+        "num_cumulative_days_moist_over_5c": 246,
+        "num_consecutive_days_moist_someplaces": 360,
+        "num_consecutive_days_moist_over_8c_someplaces": 222,
+        "days_dry_after_summer_solstice": 0,
+        "moist_days_after_winter_solstice": 120,
+        "mean_potential_evapotranspiration": [11.7, 2.2, 16.1, 45.3, 98.8, 142.6,
+            153.9, 144.5, 83.1, 42.5, 15.7, 2.7]
+    }
+
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
