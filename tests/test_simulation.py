@@ -272,3 +272,47 @@ def test_chadron():
 
     # Report true/false on comparison of results and expectations.
     assert compare_results(test_results, expected_results)
+
+def test_pittsburg1950():
+    # Perform a test of the Pitsburgh1950 dataset.
+    dataset_dict = {
+        "name": "Pittsburgh, PA",
+        "country": "USA",
+        "elevation": 310.0,
+        "start_year": "1950",
+        "end_year": "1950",
+        "ew_hemisphere": "W",
+        "is_metric": True,
+        "latitude": 40.45,
+        "longitude": 80.0,
+        "ns_hemisphere": "N",
+        "precipitation": [158.24, 76.96, 89.66, 66.29, 92.46, 118.11, 127.25, 97.54, 94.23, 33.02, 187.96, 63.5], 
+        "temperature": [5.89, 1.33, 2.56, 8.5, 17.39, 21.28, 22.56, 22.33, 18.5, 14.72, 4.83, -1.22]
+    }
+
+    test_ds = Dataset(dataset_dict)
+    test_results = run_simulation(test_ds, water_holding_capacity=76.2).to_dict()  # Non-standard WHC.
+
+    # Enforce that results match against this profile.
+    expected_results = {
+        "moisture_regime": "Udic",
+        "temperature_regime": "Mesic",
+        "regime_subdivision_1": "Typic",    # Additional checks on regime subdivisions here.
+        "regime_subdivision_2": "Udic",
+        "annual_rainfall_mm": 1205.2,
+        "num_cumulative_days_dry": 0,
+        "num_cumulative_days_moist_dry": 13,
+        "num_cumulative_days_moist": 347,
+        "num_cumulative_days_dry_over_5c": 0,
+        "num_cumulative_days_moist_dry_over_5c": 13,
+        "num_cumulative_days_moist_over_5c": 204,
+        "num_consecutive_days_moist_someplaces": 360,
+        "num_consecutive_days_moist_over_8c_someplaces": 204,
+        "days_dry_after_summer_solstice": 0,
+        "moist_days_after_winter_solstice": 120,
+        "mean_potential_evapotranspiration": [15.7, 2.2, 6.4, 33.6, 96.3, 126.7, 139.0, 
+            127.4, 87.6, 59.9, 12.0, 0.0]
+    }
+
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
