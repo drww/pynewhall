@@ -230,3 +230,45 @@ def test_pendleton():
 
     # Report true/false on comparison of results and expectations.
     assert compare_results(test_results, expected_results)
+
+def test_chadron():
+    # Perform a test of the Chadron dataset.
+    dataset_dict = {
+        "name": "Chadron, NE",
+        "country": "USA",
+        "elevation": 3510.0,
+        "start_year": "1971",
+        "end_year": "2000",
+        "ew_hemisphere": "E",
+        "is_metric": False,
+        "latitude": 42.82,
+        "longitude": -103.0,
+        "ns_hemisphere": "N",
+        "precipitation": [0.46, 0.47, 0.91, 1.89, 3.02, 2.62, 2.11, 1.67, 1.44, 1.05, 0.57, 0.42], 
+        "temperature": [22.8, 28.1, 36.2, 45.9, 56.8, 67.2, 74.1, 73.0, 61.7, 48.9, 33.7, 25.1]
+    }
+
+    test_ds = Dataset(dataset_dict)
+    test_results = run_simulation(test_ds).to_dict()
+
+    # Enforce that results match against this profile.
+    expected_results = {
+        "moisture_regime": "Aridic",
+        "temperature_regime": "Mesic",
+        "annual_rainfall_mm": 422.4,
+        "num_cumulative_days_dry": 153,
+        "num_cumulative_days_moist_dry": 124,
+        "num_cumulative_days_moist": 83,
+        "num_cumulative_days_dry_over_5c": 103,
+        "num_cumulative_days_moist_dry_over_5c": 19,
+        "num_cumulative_days_moist_over_5c": 79,
+        "num_consecutive_days_moist_someplaces": 207,
+        "num_consecutive_days_moist_over_8c_someplaces": 87,
+        "days_dry_after_summer_solstice": 93,
+        "moist_days_after_winter_solstice": 15,
+        "mean_potential_evapotranspiration": [0.0, 0.0, 7.8, 35.1, 78.5, 119.8, 149.4, 
+            134.6, 80.2, 37.5, 2.1, 0.0]
+    }
+
+    # Report true/false on comparison of results and expectations.
+    assert compare_results(test_results, expected_results)
