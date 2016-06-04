@@ -1,11 +1,16 @@
 {
-	"country": "USA",
-	"elevation": 1586.0,
-	"end_year": "1996",
-	"ew_hemisphere": "W",
-	"is_metric": false,
-	"latitude": 47.45,
-	"longitude": 99.13333333333334,
+	"name": "Columbus 3 NE",
+    "country": "USA", 
+    "elevation": 441.96,
+    "start_year": "1997",
+    "end_year": "1997",
+    "ew_hemisphere": "W",
+    "is_metric": "True",
+    "latitude": 41.4666,
+    "longitude": 97.3333,
+    "ns_hemisphere": "N", 
+    "precipitation": [7.6, 19.8, 4.1, 81.8, 86.9, 97.8, 116.6, 55.1, 103.6, 79.5, 3.9, 9.9], 
+    "temperature": [-5.0, -1.7, 3.9, 6.1, 12.8, 20.0, 23.3, 21.7, 18.3, 10.6, 1.7, -1.7],
 	"metadata": {
 		"amplitude": "",
 		"contrib_address": "",
@@ -32,10 +37,5 @@
 		"station_name": "",
 		"station_state_providence": "",
 		"unit_system": ""
-	},
-	"name": "Carrington ND",
-	"ns_hemisphere": "N",
-	"precipitation": [0.67, 0.48, 0.86, 1.39, 2.3, 3.58, 3.04, 2.05, 1.7, 1.16, 0.74, 0.52],
-	"start_year": "1948",
-	"temperature": [5.4, 11.3, 23.3, 39.9, 53.6, 62.9, 68.1, 66.5, 55.5, 44.0, 25.9, 11.5]
+	}
 }

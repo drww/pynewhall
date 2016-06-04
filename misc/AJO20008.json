@@ -1,11 +1,16 @@
 {
-	"country": "USA",
-	"elevation": 1586.0,
-	"end_year": "1996",
-	"ew_hemisphere": "W",
-	"is_metric": false,
-	"latitude": 47.45,
-	"longitude": 99.13333333333334,
+	"name": "Ajo, AZ",
+    "country": "USA", 
+    "elevation": 549.0,
+    "start_year": "1971",
+    "end_year": "2000",
+    "ew_hemisphere": "E",
+    "is_metric": "true",
+    "latitude": 32.37,
+    "longitude": -112.87,
+    "ns_hemisphere": "N", 
+    "precipitation": [17.02, 17.02, 19.3, 5.84, 3.81, 1.27, 19.3, 41.15, 20.83, 16.0, 12.7, 22.35], 
+    "temperature": [12.5, 14.61, 16.78, 20.56, 24.78, 30.06, 32.17, 31.44, 29.33, 23.89, 17.22, 12.61],
 	"metadata": {
 		"amplitude": "",
 		"contrib_address": "",
@@ -32,10 +37,5 @@
 		"station_name": "",
 		"station_state_providence": "",
 		"unit_system": ""
-	},
-	"name": "Carrington ND",
-	"ns_hemisphere": "N",
-	"precipitation": [0.67, 0.48, 0.86, 1.39, 2.3, 3.58, 3.04, 2.05, 1.7, 1.16, 0.74, 0.52],
-	"start_year": "1948",
-	"temperature": [5.4, 11.3, 23.3, 39.9, 53.6, 62.9, 68.1, 66.5, 55.5, 44.0, 25.9, 11.5]
+	}
 }

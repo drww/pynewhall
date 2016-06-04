@@ -56,6 +56,15 @@ def csv_parse(contents):
 def json_parse(contents):
     # Parse JSON, which is super-easy since it maps directly.
     input_dict = json.loads(contents)
+
+    # Make sure is_metric bool is typed correctly.
+    unitsys = input_dict["is_metric"].lower()
+    if unitsys in ["yes", "true"]:
+        input_dict["is_metric"] = True
+    elif unitsys in ["no", "false"]:
+        input_dict["is_metric"] = False
+
+    # Return built Dataset object.
     return Dataset(input_dict)
 
 def parse(file):
