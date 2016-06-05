@@ -51,39 +51,39 @@ OK
 INFO:main:Using simulation model default parameters for following simulation runs.
 INFO:main:Completed simulation run: Pendleton, OR (1971 - 2000)
 ========== NEWHALL RESULTS ===============================================
-  water_holding_capacity_mm: 200.0
-  soil_air_offset_c: 2.5
-  soil_air_amplitude: 0.66
-  annual_rainfall_mm: 335.5
-  annual_water_balance: -477.1
-  summer_water_balance: -314.0
-  mean_potential_evapotranspiration: [33.8, 35.3, 44.7, 56.9, 77.2, 93.1, 113.3, 113.6, 96.1, 70.8, 44.5, 33.2]
-  days_dry_after_summer_solstice: 120
-  moist_days_after_winter_solstice: 75
-  num_cumulative_days_dry: 199
-  num_cumulative_days_moist_dry: 51
-  num_cumulative_days_moist: 110
-  num_cumulative_days_dry_over_5c: 199
-  num_cumulative_days_moist_over_5c: 110
-  num_cumulative_days_moist_dry_over_5c: 51
-  num_consecutive_days_moist_someplaces: 161
-  num_consecutive_days_moist_over_8c_someplaces: 161
-  temperature_regime: Thermic
-  moisture_regime: Xeric
-  regime_subdivision_1: Dry
-  regime_subdivision_2: Xeric
-  dataset:
+  Water Holding Capacity (mm): 200.0
+  Soil-Air Offset (deg C): 2.5
+  Soil-Air Amplitude (%): 0.66
+  Annual Rainfall (mm): 335.5
+  Annual Water Balance (mm): -477.1
+  Summer Water Balance (mm): -314.0
+  Mean Potential Evapotranspiration (mm): [33.8, 35.3, 44.7, 56.9, 77.2, 93.1, 113.3, 113.6, 96.1, 70.8, 44.5, 33.2]
+  # Days Dry post-Summer Solstice: 120
+  # Days Moist post-Winter Solstice: 75
+  # Cumulative Days Dry: 199
+  # Cumulative Days Moist/Dry: 51
+  # Cumulative Days Moist: 110
+  # Cumulative Days Dry >5C: 199
+  # Cumulative Days Moist >5C: 110
+  # Cumulative Days Moist/Dry >5C: 51
+  # Consecutive Days Mostly Moist: 161
+  # Consecutive Days Mostly Moist >8C: 161
+  Temperature Regime: Thermic
+  Moisture Regime: Xeric
+  Regime Subdivision 1: Dry
+  Regime Subdivision 2: Xeric
+  Input Dataset:
   ========== NEWHALL DATASET ===============================================
-    name: Pendleton, OR
-    country: USA
-    latitude: 33.3
-    ns_hemisphere: N
-    longitude: -117.35
-    ew_hemisphere: E
-    elevation: 75.0
-    start_year: 1971
-    end_year: 2000
-    is_metric: False
-    precipitation: [3.0, 2.91, 2.67, 0.81, 0.32, 0.14, 0.08, 0.02, 0.14, 0.46, 0.93, 1.73]
-    temperature: [55.1, 56.0, 56.8, 59.6, 63.3, 66.7, 70.5, 71.9, 70.6, 65.5, 59.1, 55.2]
+    Site Name: Pendleton, OR
+    Country: USA
+    Latitude (deg): 33.3
+    Latitude Hemisphere: N
+    Longitude (deg): -117.35
+    Longitude Hemisphere: E
+    Elevation (m/ft): 75.0
+    Start Year: 1971
+    End Year: 2000
+    Metric Units?: False
+    Precipitation (mm/in): [3.0, 2.91, 2.67, 0.81, 0.32, 0.14, 0.08, 0.02, 0.14, 0.46, 0.93, 1.73]
+    Temperature (deg C/F): [55.1, 56.0, 56.8, 59.6, 63.3, 66.7, 70.5, 71.9, 70.6, 65.5, 59.1, 55.2]
 </pre>
