@@ -57,7 +57,8 @@ INFO:main:Completed simulation run: Pendleton, OR (1971 - 2000)
   Annual Rainfall (mm): 335.5
   Annual Water Balance (mm): -477.1
   Summer Water Balance (mm): -314.0
-  Mean Potential Evapotranspiration (mm): [33.8, 35.3, 44.7, 56.9, 77.2, 93.1, 113.3, 113.6, 96.1, 70.8, 44.5, 33.2]
+  Mean Potential Evapotranspiration (mm): [33.8, 35.3, 44.7, 56.9, 77.2, 93.1,
+      113.3, 113.6, 96.1, 70.8, 44.5, 33.2]
   # Days Dry post-Summer Solstice: 120
   # Days Moist post-Winter Solstice: 75
   # Cumulative Days Dry: 199
@@ -84,6 +85,8 @@ INFO:main:Completed simulation run: Pendleton, OR (1971 - 2000)
     Start Year: 1971
     End Year: 2000
     Metric Units?: False
-    Precipitation (mm/in): [3.0, 2.91, 2.67, 0.81, 0.32, 0.14, 0.08, 0.02, 0.14, 0.46, 0.93, 1.73]
-    Temperature (deg C/F): [55.1, 56.0, 56.8, 59.6, 63.3, 66.7, 70.5, 71.9, 70.6, 65.5, 59.1, 55.2]
+    Precipitation (mm/in): [3.0, 2.91, 2.67, 0.81, 0.32, 0.14,
+        0.08, 0.02, 0.14, 0.46, 0.93, 1.73]
+    Temperature (deg C/F): [55.1, 56.0, 56.8, 59.6, 63.3, 66.7,
+        70.5, 71.9, 70.6, 65.5, 59.1, 55.2]
 </pre>
