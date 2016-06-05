@@ -6,6 +6,7 @@ class Dataset:
     # Also includes a metadata dictionary should there be optional details
     # to store that are unrelated to model operation.
 
+    # Single-property manipulators.
     def get(self, key):
         return self.ds_dict[key]
 
@@ -15,6 +16,7 @@ class Dataset:
         else:
             raise Exception("Argument key is not a valid dataset property.")
 
+    # Exporter functions, including textual report.
     def to_dict(self):
         return self.ds_dict
 
@@ -28,9 +30,13 @@ class Dataset:
             "ew_hemisphere", "elevation", "start_year", "end_year", "is_metric",
             "precipitation", "temperature"]
 
+        labels_ordered = ["Site Name", "Country", "Latitude (deg)", "Latitude Hemisphere", "Longitude (deg)",
+            "Longitude Hemisphere", "Elevation (m/ft)", "Start Year", "End Year", "Metric Units?",
+            "Precipitation (mm/in)", "Temperature (deg C/F)"]
+
         txt_report = "========== NEWHALL DATASET ==============================================="
-        for prop in property_order:
-            txt_report += "\n  {}: {}".format(prop, self.get(prop))
+        for prop in range(0, len(property_order)):
+            txt_report += "\n  {}: {}".format(labels_ordered[prop], self.get(property_order[prop]))
         return txt_report
 
     def __init__(self, input_dict, input_metadata_dict=None):
@@ -108,6 +114,7 @@ class RunResult:
     # and so forth.  Also includes the model run inputs so all variables used to generate
     # the results are preserved.
 
+    # Single element manipulators.
     def get(self, key):
         return self.rr_dict[key]
 
@@ -117,6 +124,7 @@ class RunResult:
         else:
             raise Exception("Argument key is not a valid dataset property.")
 
+    # Exporter functions.
     def to_dict(self):
         composite_dict = self.rr_dict
         composite_dict["dataset"] = self.dataset.to_dict()
@@ -139,11 +147,21 @@ class RunResult:
         "num_consecutive_days_moist_over_8c_someplaces", "temperature_regime", "moisture_regime",
         "regime_subdivision_1", "regime_subdivision_2"]
 
+        labels_ordered = ["Water Holding Capacity (mm)", "Soil-Air Offset (deg C)", "Soil-Air Amplitude (%)",
+            "Annual Rainfall (mm)", "Annual Water Balance (mm)", "Summer Water Balance (mm)", "Mean Potential Evapotranspiration (mm)",
+            "# Days Dry post-Summer Solstice", "# Days Moist post-Winter Solstice", "# Cumulative Days Dry",
+            "# Cumulative Days Moist/Dry", "# Cumulative Days Moist", "# Cumulative Days Dry >5C",
+            "# Cumulative Days Moist >5C", "# Cumulative Days Moist/Dry >5C", "# Consecutive Days Mostly Moist",
+            "# Consecutive Days Mostly Moist >8C", "Temperature Regime", "Moisture Regime", "Regime Subdivision 1",
+            "Regime Subdivision 2"]
+
         dataset_report = self.get_dataset().to_report()
         txt_report = "========== NEWHALL RESULTS ==============================================="
-        for prop in property_order:
-            txt_report += "\n  {}: {}".format(prop, self.get(prop))
-        txt_report += "\n  dataset:"
+        # for prop in property_order:
+        for prop in range(0, len(property_order)):
+            txt_report += "\n  {}: {}".format(labels_ordered[prop], self.get(property_order[prop]))
+
+        txt_report += "\n  Input Dataset:"
         for line in dataset_report.split("\n"):
             # Print, with indent.
             txt_report += "\n  {}".format(line)

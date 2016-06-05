@@ -11,7 +11,11 @@ logger = logging.getLogger("main")
 def print_version():
     print "PyNewhall {}".format(VERSION)
 
+# Given a single dataset or many datasets, process each with
+# any model parameter overrides.  Return results as either a
+# single result or a list of results.  Recursively follows dirs.
 def run_model(file_or_directory, param_map={}):
+
     # Determine if input is single or multi run.
     if os.path.isfile(file_or_directory):
         # Single run mode, open file and run.
@@ -37,6 +41,7 @@ def run_model(file_or_directory, param_map={}):
         logger.info("Completed simulation run: {} ({} - {})".format(dataset.get("name"),
             dataset.get("start_year"), dataset.get("end_year")))
         return result
+        
     elif os.path.isdir(file_or_directory):
         # Gather files an directories, and perform a recursive descent
         # into the contents, collecting results from runs.
@@ -55,10 +60,12 @@ def run_model(file_or_directory, param_map={}):
         # Not a file or directory, exit.
         raise Exception("Not a file or directory: {}".format(file_or_directory))
 
+# Main command line interface logic, takes parameters and invokes model.
 if __name__ == "__main__":
     description = "PyNewhall {} - CLI Interface for the Newhall Simulation Model".format(
         VERSION)
 
+    # Collect and parse arguments.
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--version", help="show version and exit", action="store_true")
     parser.add_argument("--debug", help="report extra debugging information while running", action="store_true")
@@ -68,6 +75,7 @@ if __name__ == "__main__":
     parser.add_argument("--amp", help="override default soil-air relationship amplitude (0.66)", type=float)
     args = parser.parse_args()
 
+    # Enable debug logging.
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
     else:
@@ -94,17 +102,20 @@ if __name__ == "__main__":
                 logger.info("Using simulation model default parameters for following simulation runs.")
             all_results = run_model(args.run, model_params)
 
+            # May return single run or list of runs.
             if isinstance(all_results, list):
                 for result in all_results:
                     print "\n{}".format(result.to_report())
             else:
                 print"\n{}".format(all_results.to_report())
-            
-
+            # All done and nothing broke!
         except Exception as ex:
             # Report exception message.
             print ex
             exit(1)
+
+        # Report a successful program termination.
         exit(0)
     else:
+        # No args specified, nudge user towards help screen.
         print "No datasets specified, exiting.  Use --help for more details."
