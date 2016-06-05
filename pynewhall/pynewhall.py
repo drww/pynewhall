@@ -3,6 +3,7 @@ import argparse, os, logging
 from dataset import Dataset
 from parsers import parse
 from simulation import run_simulation
+from gui import build_root
 
 VERSION = 0.8
 
@@ -41,7 +42,7 @@ def run_model(file_or_directory, param_map={}):
         logger.info("Completed simulation run: {} ({} - {})".format(dataset.get("name"),
             dataset.get("start_year"), dataset.get("end_year")))
         return result
-        
+
     elif os.path.isdir(file_or_directory):
         # Gather files an directories, and perform a recursive descent
         # into the contents, collecting results from runs.
@@ -73,6 +74,7 @@ if __name__ == "__main__":
     parser.add_argument("--whc", help="override default waterholding capacity (200 mm)", type=float)
     parser.add_argument("--sao", help="override default soil-air offset (2.5 deg C)", type=float)
     parser.add_argument("--amp", help="override default soil-air relationship amplitude (0.66)", type=float)
+    parser.add_argument("--gui", help="launches the graphical user interface", action="store_true")
     args = parser.parse_args()
 
     # Enable debug logging.
@@ -84,6 +86,11 @@ if __name__ == "__main__":
     if args.version:
         # Print version and exit succesfully.
         print_version()
+        exit(0)
+
+    if args.gui:
+        # Launch main GUI window, exit when window closes.
+        build_root()
         exit(0)
 
     if args.run:
